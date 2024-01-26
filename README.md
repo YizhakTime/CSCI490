@@ -1,3 +1,3 @@
 # CSCI490
-
-I am wanting to make a language app
+Name: Yizhak Cohen
+Username: YizhakTime
