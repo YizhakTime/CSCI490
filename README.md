@@ -7,6 +7,6 @@ I want users to be able to use their phone to take live video of objects (road s
 
 My project will use Yolov8 along with Google Translate API to detect images in real-time and translate them in different languages to help users develop their fluency in their target language. My goal will be to deploy and have it working on Flutter, but I am testing (as a backup) in my desktop. 
 
-Timeline:
+Timeline:  
 (1/29) -> Installed Flutter and cmd-line tools  
 (1/30) -> Build basic scaffolding for app
