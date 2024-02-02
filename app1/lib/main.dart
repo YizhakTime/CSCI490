@@ -52,7 +52,7 @@ class MyHomePage extends StatefulWidget {
   - print(await createOrderMessage());
 */
   Future<http.Response> getTranslationApi() {
-    return http.get(Uri.parse("url"));
+    return http.get(Uri.parse("https://jsonplaceholder.typicode.com/todos/1"));
   }
 
 /*
