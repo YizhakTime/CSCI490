@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +37,23 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
+
+  //Future is an async operation which means result will be ready in future
+  //When another fxn calls it, it should wait until Future fxn is ready to return
+  //(i.e. it should use the await keyword)
+  //This should be in the camera page
+  /*
+  1. Add async to function body 
+  - void test() async {}
+  2. If fxn returns a type, update type to be Future<T>, where T is type fxn returns
+  - Else, if fxn doesn't return a type, then return type is Future<void>
+  Future<void> main() async {}
+  3. Use await keyword to wait for future to complete 
+  - print(await createOrderMessage());
+*/
+  Future<http.Response> getTranslationApi() {
+    return http.get(Uri.parse("url"));
+  }
 
 /*
 Future<http.Response> fetchAlbum() {
