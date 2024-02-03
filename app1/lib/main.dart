@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,9 +52,9 @@ class MyHomePage extends StatefulWidget {
   3. Use await keyword to wait for future to complete 
   - print(await createOrderMessage());
 */
-  Future<http.Response> getTranslationApi() {
-    return http.get(Uri.parse("https://jsonplaceholder.typicode.com/todos/1"));
-  }
+  // Future<http.Response> getTranslationApi() {
+  //   return http.get(Uri.parse("https://jsonplaceholder.typicode.com/todos/1"));
+  // }
 
 /*
 Future<http.Response> fetchAlbum() {
