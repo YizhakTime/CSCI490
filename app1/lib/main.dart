@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
 void main() {
   runApp(const MyApp());
