@@ -6,7 +6,15 @@ import 'package:async/async.dart';
 // import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:translator/translator.dart';
 
-void main() {
+void main() async {
+  final translator = GoogleTranslator();
+  const input = "Здравствуйте. Ты в порядке?";
+  translator.translate(input, from: 'ru', to: 'en').then(print);
+  // prints Hello. Are you okay?
+  var translation = await translator.translate("Dart is very cool!", to: 'pl');
+  print(translation);
+  // prints Dart jest bardzo fajny!
+  print(await "example".translate(to: 'pt'));
   runApp(const MyApp());
 }
 
@@ -112,6 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
+
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
