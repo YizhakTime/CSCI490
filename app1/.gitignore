@@ -11,6 +11,8 @@
 migrate_working_dir/
 index.html
 
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
 # IntelliJ related
 *.iml
 *.ipr
