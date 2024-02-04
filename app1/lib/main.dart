@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 // import 'package:async/async.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-// import 'package:flutter_translate/flutter_translate.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
-// import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:translator/translator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
