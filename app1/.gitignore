@@ -10,6 +10,7 @@
 .svn/
 migrate_working_dir/
 
+
 index.html
 macos/Runner/GoogleService-Info.plist
 macos
