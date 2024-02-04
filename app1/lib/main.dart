@@ -12,15 +12,6 @@ import 'package:translator/translator.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-        options: const FirebaseOptions(
-            apiKey: "AIzaSyBri2e1lrPtIvV2lWmmJ0b2qBGwOKmxcOE",
-            appId: "1:177920090403:web:d26ec67cacc5e9a7a7ac96",
-            messagingSenderId: "177920090403",
-            projectId: "languagelearner-98431"));
-  }
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
