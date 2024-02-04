@@ -1,12 +1,30 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:async/async.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:async/async.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 // import 'package:flutter_translate/flutter_translate.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:translator/translator.dart';
 
-void main() async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+            apiKey: "AIzaSyBri2e1lrPtIvV2lWmmJ0b2qBGwOKmxcOE",
+            appId: "1:177920090403:web:d26ec67cacc5e9a7a7ac96",
+            messagingSenderId: "177920090403",
+            projectId: "languagelearner-98431"));
+  }
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   final translator = GoogleTranslator();
   const input = "Здравствуйте. Ты в порядке?";
   translator.translate(input, from: 'ru', to: 'en').then(print);

@@ -44,6 +44,7 @@ dependencies:
   intl: any
   # google_mlkit_translation: ^0.9.0
   translator:
+  firebase_core: ^2.25.3
 
 dev_dependencies:
   flutter_test:
