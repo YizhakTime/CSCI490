@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:app1/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Signin extends StatefulWidget {
@@ -9,6 +10,7 @@ class Signin extends StatefulWidget {
 }
 
 class _SigninState extends State<Signin> {
+  final AuthLogic _authState = AuthLogic();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +25,12 @@ class _SigninState extends State<Signin> {
           padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 40.0),
           child: ElevatedButton(
             child: const Text("Sign-up"),
-            onPressed: () async {},
+            onPressed: () async {
+              final user = await _authState.loginAnon();
+              if (user == null) {
+                print("Error");
+              }
+            },
           )),
     );
   }
