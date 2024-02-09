@@ -18,16 +18,16 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // final translator = GoogleTranslator();
-  // const input = "Здравствуйте. Ты в порядке?";
-  // translator.translate(input, from: 'ru', to: 'en').then(print);
-  // // prints Hello. Are you okay?
-  // Translation translation =
-  //     await translator.translate("Dart is very cool!", to: 'pl');
-  // print(translation);
-  // // prints Dart jest bardzo fajny!
-  // print(await "example".translate(to: 'pt'));
-  // runApp(const MyApp());
+  final translator = GoogleTranslator();
+  const input = "Здравствуйте. Ты в порядке?";
+  translator.translate(input, from: 'ru', to: 'en').then(print);
+  // prints Hello. Are you okay?
+  Translation translation =
+      await translator.translate("Dart is very cool!", to: 'pl');
+  print(translation);
+  // prints Dart jest bardzo fajny!
+  print(await "example".translate(to: 'pt'));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
