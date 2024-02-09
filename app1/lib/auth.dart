@@ -6,12 +6,12 @@ class AuthLogic {
   // AuthLogic(this._firebaseAuth);
   //underscore equals private
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  // Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   Future loginAnon() async {
     try {
       UserCredential result = await _auth.signInAnonymously();
-      final anonUser = result.user;
+      User? anonUser = result.user;
       print("Signed in with temporary account.");
       return anonUser;
     } on FirebaseAuthException catch (e) {

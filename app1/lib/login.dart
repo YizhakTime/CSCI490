@@ -29,6 +29,9 @@ class _SigninState extends State<Signin> {
               final user = await _authState.loginAnon();
               if (user == null) {
                 print("Error");
+              } else {
+                print("Success");
+                print(user);
               }
             },
           )),
