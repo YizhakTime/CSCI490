@@ -16,6 +16,20 @@ class Home extends StatelessWidget {
     const String appTitle = "Language Learner";
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<ProfileScreen>(
+                  builder: (context) => const ProfileScreen(),
+                ),
+              );
+            },
+          )
+        ],
+        automaticallyImplyLeading: false,
         title: const Text(appTitle),
         backgroundColor: const Color(0xff6750a4),
       ),
