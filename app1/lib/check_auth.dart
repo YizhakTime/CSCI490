@@ -20,7 +20,7 @@ class CheckAuthState extends StatelessWidget {
             ],
           );
         } //No data
-        return const Home();
+        return Home(user: snapshot.data);
       },
     );
   }
