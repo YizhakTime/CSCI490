@@ -8,22 +8,14 @@ class MyUser {
 }
 
 //String greeting => "Hello";
-class MyWidget extends StatefulWidget {
-  const MyWidget({super.key});
-
-  @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
 
 class Home extends StatelessWidget {
-  const Home({super.key, required this.user});
+  Home({super.key, required this.user});
+  final FirebaseAuth myuser = FirebaseAuth.instance;
+
+  Future<void> signOut(BuildContext context) async {
+    await myuser.signOut();
+  }
 
   final User? user;
   @override
@@ -65,31 +57,27 @@ class Home extends StatelessWidget {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Color(0xff6750a4),
-                ),
-                child: Text(
-                  "Options",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
+              const SizedBox(
+                height: 135,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Color(0xff6750a4),
+                  ),
+                  child: Text(
+                    "Options",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
                   ),
                 ),
               ),
-              // ListTile(
-              //   title: const Text("Notes"),
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //   },
-              // ),
               ListTile(
-                title: const Text("Sign-out"),
-                onTap: () {
-                  const SignOutButton();
-                  Navigator.of(context).pop();
-                },
-              ),
+                  title: const Text("Sign-out"),
+                  leading: const Icon(Icons.logout),
+                  onTap: () {
+                    signOut(context);
+                  }),
             ],
           ),
         ),
@@ -101,7 +89,6 @@ class Home extends StatelessWidget {
               'Welcome!',
               style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SignOutButton(),
           ],
         ),
       ),
