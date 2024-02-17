@@ -5,10 +5,60 @@ enum LanguageLabel {
   spanish("es"),
   english("en"),
   german("de"),
-  italian("it");
+  italian("it"),
+  persian("fa"),
+  turkish("tr");
 
   const LanguageLabel(this.label);
   final String label;
+}
+
+class Dropdown extends StatefulWidget {
+  const Dropdown({super.key});
+
+  @override
+  State<Dropdown> createState() => _DropdownState();
+}
+
+class _DropdownState extends State<Dropdown> {
+  final TextEditingController languageController = TextEditingController();
+  LanguageLabel? myLanguage;
+  // String tmp = "";
+  // void getValue(String test) {
+  //   tmp = test;
+  // }
+
+  // String myValue() {
+  //   return tmp;
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu<LanguageLabel>(
+      initialSelection: LanguageLabel.spanish,
+      controller: languageController,
+      requestFocusOnTap: false,
+      label: const Text('Language'),
+      onSelected: (LanguageLabel? language) {
+        setState(() {
+          myLanguage = language;
+        });
+        print(myLanguage!.label);
+        // getValue(myLanguage!.label);
+      },
+      dropdownMenuEntries: LanguageLabel.values
+          .map<DropdownMenuEntry<LanguageLabel>>((LanguageLabel label) {
+        return DropdownMenuEntry<LanguageLabel>(
+          value: label,
+          label: label.label,
+          enabled: label.label != "None",
+          style: MenuItemButton.styleFrom(
+            foregroundColor: Colors.black,
+          ),
+        );
+      }).toList(),
+    );
+  } //build
 }
 
 class MyForm extends StatefulWidget {
@@ -24,7 +74,6 @@ class MyFormState extends State<MyForm> {
   final _key = GlobalKey<FormState>();
   final myController = TextEditingController();
   late String translation = "";
-
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -33,10 +82,10 @@ class MyFormState extends State<MyForm> {
   }
 
   void setTranslation() async {
-    String firstTranslation = await translate(myController.text);
+    String getTranslation = await translate(myController.text);
 
     setState(() {
-      translation = firstTranslation;
+      translation = getTranslation;
     });
   }
 
@@ -60,6 +109,9 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
+                // final test = DropdownState();
+                // String str = test.myValue();
+                // print(str);
                 setTranslation();
                 showDialog(
                   context: context,
@@ -107,6 +159,12 @@ class Translatepage extends StatelessWidget {
             },
           ),
           const MyForm(),
+          const Dropdown(),
+          // FloatingActionButton(
+          //   onPressed: () => test(),
+          //   tooltip: 'Increment',
+          //   child: const Icon(Icons.add),
+          // ),
         ])));
   }
 }
