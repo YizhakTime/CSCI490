@@ -84,13 +84,14 @@ class Home extends StatelessWidget {
             ),
           ),
         ),
-        body: Center(
+        body: const Center(
           child: Column(
             children: [
               Text(
-                'Welcome!',
-                style: Theme.of(context).textTheme.displaySmall,
+                'Welcome To Language Learner!',
+                style: TextStyle(fontSize: 30),
               ),
+              Text("Press the Translate button to translate anything you want!")
             ],
           ),
         ),

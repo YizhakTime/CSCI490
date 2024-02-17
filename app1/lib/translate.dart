@@ -23,12 +23,21 @@ class MyForm extends StatefulWidget {
 class MyFormState extends State<MyForm> {
   final _key = GlobalKey<FormState>();
   final myController = TextEditingController();
+  late String translation = "";
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     myController.dispose();
     super.dispose();
+  }
+
+  void setTranslation() async {
+    String firstTranslation = await translate(myController.text);
+
+    setState(() {
+      translation = firstTranslation;
+    });
   }
 
   @override
@@ -51,24 +60,15 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
+                setTranslation();
                 showDialog(
                   context: context,
                   builder: (context) {
-                    // Retrieve the text that the user has entered by using the
-                    // TextEditingController.
                     return AlertDialog(
-                      content: Text(myController.text),
-                      // content: Text(translate(myController.text) as String),
-                      // String mytext = translate(myController.text);
-                      // content: Text(text),
-                      // content: translate(myController.text),
+                      content: Text(translation),
                     );
-                    // return AlertDialog(
-                    //   content: Text(myController.text),
-                    // );
                   },
                 );
-                // translate();
                 // ScaffoldMessenger.of(context).showSnackBar(
                 //   const SnackBar(content: Text('Processing Data')),
                 // );
@@ -82,21 +82,16 @@ class MyFormState extends State<MyForm> {
   }
 }
 
-// Future<void> translate(String mytext) async {
 Future<String> translate(String mytext) async {
   final gt = SimplyTranslator(EngineType.google);
-  String textResult = await gt.trSimply(mytext, "de", "en");
+  String textResult = await gt.trSimply(mytext, "en", "de");
   // String textResult = await gt.trSimply("Er läuft schnell.", "de", 'en');
-  // Text(textResult);
   return textResult;
-  //He walks fast.
   //using Googletranslate:
-  //short form to only get translated text as String, also shorter code:
 }
 
 class Translatepage extends StatelessWidget {
   const Translatepage({super.key});
-  // final VoidCallback addUser; // ==> Here is the answer.
 
   @override
   Widget build(BuildContext context) {
