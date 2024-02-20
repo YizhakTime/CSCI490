@@ -23,10 +23,12 @@ class Dropdown extends StatefulWidget {
 class _DropdownState extends State<Dropdown> {
   final TextEditingController languageController = TextEditingController();
   LanguageLabel? myLanguage;
-  // String tmp = "";
-  // void getValue(String test) {
-  //   tmp = test;
-  // }
+  String tmp = "";
+  String? value;
+
+  void getValue() {
+    print(value);
+  }
 
   // String myValue() {
   //   return tmp;
@@ -42,8 +44,11 @@ class _DropdownState extends State<Dropdown> {
       onSelected: (LanguageLabel? language) {
         setState(() {
           myLanguage = language;
+          value = myLanguage!.label;
         });
-        print(myLanguage!.label);
+        // print(myLanguage!.label);
+        // print(myLanguage!.label);
+        // getValue(myLanguage!.label);
         // getValue(myLanguage!.label);
       },
       dropdownMenuEntries: LanguageLabel.values
