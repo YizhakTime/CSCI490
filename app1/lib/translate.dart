@@ -26,10 +26,6 @@ class _DropdownState extends State<Dropdown> {
   String tmp = "";
   String? value;
 
-  void getValue() {
-    print(value);
-  }
-
   @override
   Widget build(BuildContext context) {
     return DropdownMenu<LanguageLabel>(
@@ -42,7 +38,7 @@ class _DropdownState extends State<Dropdown> {
           myLanguage = language;
           value = myLanguage!.label;
         });
-        // print(myLanguage!.label);
+        print(myLanguage!.label);
         // print(myLanguage!.label);
         // getValue(myLanguage!.label);
         // getValue(myLanguage!.label);
@@ -114,6 +110,7 @@ class MyFormState extends State<MyForm> {
                 // String str = test.myValue();
                 // print(str);
                 setTranslation();
+                // print(_myKey.currentState!.myLanguage!.label);
                 showDialog(
                   context: context,
                   builder: (context) {
