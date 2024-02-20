@@ -30,10 +30,6 @@ class _DropdownState extends State<Dropdown> {
     print(value);
   }
 
-  // String myValue() {
-  //   return tmp;
-  // }
-
   @override
   Widget build(BuildContext context) {
     return DropdownMenu<LanguageLabel>(
