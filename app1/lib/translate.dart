@@ -39,9 +39,6 @@ class _DropdownState extends State<Dropdown> {
           value = myLanguage!.label;
         });
         print(myLanguage!.label);
-        // print(myLanguage!.label);
-        // getValue(myLanguage!.label);
-        // getValue(myLanguage!.label);
       },
       dropdownMenuEntries: LanguageLabel.values
           .map<DropdownMenuEntry<LanguageLabel>>((LanguageLabel label) {
@@ -106,9 +103,6 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
-                // final test = DropdownState();
-                // String str = test.myValue();
-                // print(str);
                 setTranslation();
                 // print(_myKey.currentState!.myLanguage!.label);
                 showDialog(
@@ -119,9 +113,6 @@ class MyFormState extends State<MyForm> {
                     );
                   },
                 );
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(content: Text('Processing Data')),
-                // );
               }
             },
             child: const Text('Submit'),
@@ -158,11 +149,6 @@ class Translatepage extends StatelessWidget {
           ),
           const MyForm(),
           const Dropdown(),
-          // FloatingActionButton(
-          //   onPressed: () => test(),
-          //   tooltip: 'Increment',
-          //   child: const Icon(Icons.add),
-          // ),
         ])));
   }
 }
