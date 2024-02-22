@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:simplytranslate/simplytranslate.dart';
 
 enum LanguageLabel {
@@ -7,10 +8,21 @@ enum LanguageLabel {
   german("de"),
   italian("it"),
   persian("fa"),
-  turkish("tr");
+  turkish("tr"),
+  japanese("ja");
 
   const LanguageLabel(this.label);
   final String label;
+}
+
+class MyProvider with ChangeNotifier {
+  LanguageLabel _option = LanguageLabel.english;
+  LanguageLabel get selectedLanguage => _option;
+
+  void test(LanguageLabel value) {
+    _option = value;
+    notifyListeners();
+  }
 }
 
 class Dropdown extends StatefulWidget {
@@ -28,18 +40,29 @@ class _DropdownState extends State<Dropdown> {
 
   @override
   Widget build(BuildContext context) {
+    final option = Provider.of<MyProvider>(context, listen: false);
+    final myOption = option.selectedLanguage;
     return DropdownMenu<LanguageLabel>(
-      initialSelection: LanguageLabel.spanish,
+      initialSelection: myOption,
+      // onValueChanged: (LanguageLabel newValue) {
+      //   optionProvider.selectedOption = newValue;
+      // },
+      // initialSelection: LanguageLabel.spanish,
       controller: languageController,
       requestFocusOnTap: false,
       label: const Text('Language'),
       onSelected: (LanguageLabel? language) {
         setState(() {
-          myLanguage = language;
-          value = myLanguage!.label;
+          option.test(language!);
         });
-        print(myLanguage!.label);
       },
+      // onSelected: (LanguageLabel? language) {
+      //   setState(() {
+      //     myLanguage = language;
+      //     value = myLanguage!.label;
+      //   });
+      //   print(myLanguage!.label);
+      // },
       dropdownMenuEntries: LanguageLabel.values
           .map<DropdownMenuEntry<LanguageLabel>>((LanguageLabel label) {
         return DropdownMenuEntry<LanguageLabel>(
@@ -75,8 +98,8 @@ class MyFormState extends State<MyForm> {
     super.dispose();
   }
 
-  void setTranslation() async {
-    String getTranslation = await translate(myController.text);
+  void setTranslation(String option) async {
+    String getTranslation = await translate(myController.text, option);
 
     setState(() {
       translation = getTranslation;
@@ -85,6 +108,10 @@ class MyFormState extends State<MyForm> {
 
   @override
   Widget build(BuildContext context) {
+    final testProvider = Provider.of<MyProvider>(context, listen: false);
+    final myTest = testProvider.selectedLanguage;
+
+    // return Text(selectedOption != null ? selectedOption.name : 'No option selected');
     return Form(
       key: _key,
       child: Column(
@@ -103,7 +130,8 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
-                setTranslation();
+                // print(myTest.label);
+                setTranslation(myTest.label);
                 // print(_myKey.currentState!.myLanguage!.label);
                 showDialog(
                   context: context,
@@ -123,9 +151,10 @@ class MyFormState extends State<MyForm> {
   }
 }
 
-Future<String> translate(String mytext) async {
+Future<String> translate(String mytext, String option) async {
   final gt = SimplyTranslator(EngineType.google);
-  String textResult = await gt.trSimply(mytext, "en", "de");
+  // String textResult = await gt.trSimply(mytext, "en", "de");
+  String textResult = await gt.trSimply(mytext, "en", option);
   // String textResult = await gt.trSimply("Er läuft schnell.", "de", 'en');
   return textResult;
   //using Googletranslate:
@@ -136,19 +165,24 @@ class Translatepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text("Language Learner")),
-        body: Center(
-            child: Column(children: [
-          ElevatedButton(
-            child: const Text("Go back"),
-            onPressed: () {
-              // translate();
-              Navigator.pop(context);
-            },
-          ),
-          const MyForm(),
-          const Dropdown(),
-        ])));
+    return ChangeNotifierProvider(
+      create: (context) => MyProvider(),
+      child: Scaffold(
+          appBar: AppBar(title: const Text("Language Learner")),
+          body: Center(
+              child: Column(children: [
+            ElevatedButton(
+              child: const Text("Go back"),
+              onPressed: () {
+                // translate();
+                Navigator.pop(context);
+              },
+            ),
+            const MyForm(),
+            const Dropdown(),
+            const SizedBox(height: 20),
+            const Dropdown(),
+          ]))),
+    );
   }
 }
