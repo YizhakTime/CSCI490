@@ -165,8 +165,8 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
-                print(testProvider._option.label);
-                print(testProvider._option2.label);
+                // print(testProvider._option.label);
+                // print(testProvider._option2.label);
                 // setTranslation(myTest.label, testProvider._option2.label);
                 setTranslation(
                     testProvider._option.label, testProvider._option2.label);
