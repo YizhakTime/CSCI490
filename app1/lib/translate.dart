@@ -300,7 +300,6 @@ class Translatepage extends StatelessWidget {
               const MyForm(),
               const Dropdown(),
               const Notecard(),
-
               Container(
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton(
