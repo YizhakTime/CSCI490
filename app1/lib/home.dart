@@ -128,24 +128,36 @@ class Home extends StatelessWidget {
           ),
         ),
         floatingActionButton: Row(children: [
-          FloatingActionButton(
-            onPressed: () {},
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xff6750a4),
-            child: const Icon(Icons.camera),
+          const Spacer(),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16.0, right: 10.0),
+              child: FloatingActionButton(
+                onPressed: () {},
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xff6750a4),
+                child: const Icon(Icons.camera),
+              ),
+            ),
           ),
           const SizedBox(width: 10),
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Translatepage()),
-              );
-              // translate();
-            },
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xff6750a4),
-            child: const Icon(Icons.translate),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16.0),
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Translatepage()),
+                  );
+                  // translate();
+                },
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xff6750a4),
+                child: const Icon(Icons.translate),
+              ),
+            ),
           ),
         ]));
   }
