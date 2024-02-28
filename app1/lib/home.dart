@@ -2,11 +2,43 @@ import 'package:app1/translate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vision/flutter_vision.dart';
 // import 'package:simplytranslate/simplytranslate.dart';
 
 class MyUser {
   late String id;
   // MyUser({this.id})
+}
+
+enum Options { none, imagev5, imagev8, imagev8seg, frame, tesseract, vision }
+
+class Vision extends StatefulWidget {
+  const Vision({super.key});
+
+  @override
+  State<Vision> createState() => _VisionState();
+}
+
+class _VisionState extends State<Vision> {
+  late FlutterVision vision;
+  Options option = Options.none;
+  @override
+  void initState() {
+    super.initState();
+    vision = FlutterVision();
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    await vision.closeTesseractModel();
+    await vision.closeYoloModel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
 
 //String greeting => "Hello";
@@ -102,6 +134,7 @@ class Home extends StatelessWidget {
             backgroundColor: const Color(0xff6750a4),
             child: const Icon(Icons.camera),
           ),
+          const SizedBox(width: 10),
           FloatingActionButton(
             onPressed: () {
               Navigator.push(

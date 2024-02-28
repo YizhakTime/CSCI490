@@ -17,10 +17,17 @@ enum LanguageLabel {
 
 class MyProvider with ChangeNotifier {
   LanguageLabel _option = LanguageLabel.english;
+  LanguageLabel _option2 = LanguageLabel.english;
   LanguageLabel get selectedLanguage => _option;
+  LanguageLabel get inputLanguage => _option2;
 
   void test(LanguageLabel value) {
     _option = value;
+    notifyListeners();
+  }
+
+  void test2(LanguageLabel val) {
+    _option2 = val;
     notifyListeners();
   }
 }
@@ -34,6 +41,7 @@ class Dropdown extends StatefulWidget {
 
 class _DropdownState extends State<Dropdown> {
   final TextEditingController languageController = TextEditingController();
+  final TextEditingController languageController2 = TextEditingController();
   LanguageLabel? myLanguage;
   String tmp = "";
   String? value;
@@ -42,39 +50,66 @@ class _DropdownState extends State<Dropdown> {
   Widget build(BuildContext context) {
     final option = Provider.of<MyProvider>(context, listen: false);
     final myOption = option.selectedLanguage;
-    return DropdownMenu<LanguageLabel>(
-      initialSelection: myOption,
-      // onValueChanged: (LanguageLabel newValue) {
-      //   optionProvider.selectedOption = newValue;
-      // },
-      // initialSelection: LanguageLabel.spanish,
-      controller: languageController,
-      requestFocusOnTap: false,
-      label: const Text('Language'),
-      onSelected: (LanguageLabel? language) {
-        setState(() {
-          option.test(language!);
-        });
-      },
-      // onSelected: (LanguageLabel? language) {
-      //   setState(() {
-      //     myLanguage = language;
-      //     value = myLanguage!.label;
-      //   });
-      //   print(myLanguage!.label);
-      // },
-      dropdownMenuEntries: LanguageLabel.values
-          .map<DropdownMenuEntry<LanguageLabel>>((LanguageLabel label) {
-        return DropdownMenuEntry<LanguageLabel>(
-          value: label,
-          label: label.label,
-          enabled: label.label != "None",
-          style: MenuItemButton.styleFrom(
-            foregroundColor: Colors.black,
-          ),
-        );
-      }).toList(),
-    );
+    return Row(children: [
+      DropdownMenu<LanguageLabel>(
+        initialSelection: myOption,
+        // onValueChanged: (LanguageLabel newValue) {
+        //   optionProvider.selectedOption = newValue;
+        // },
+        // initialSelection: LanguageLabel.spanish,
+        controller: languageController,
+        requestFocusOnTap: false,
+        label: const Text('Language'),
+        onSelected: (LanguageLabel? language) {
+          setState(() {
+            option.test(language!);
+          });
+        },
+        // onSelected: (LanguageLabel? language) {
+        //   setState(() {
+        //     myLanguage = language;
+        //     value = myLanguage!.label;
+        //   });
+        //   print(myLanguage!.label);
+        // },
+        dropdownMenuEntries: LanguageLabel.values
+            .map<DropdownMenuEntry<LanguageLabel>>((LanguageLabel label) {
+          return DropdownMenuEntry<LanguageLabel>(
+            value: label,
+            label: label.label,
+            enabled: label.label != "None",
+            style: MenuItemButton.styleFrom(
+              foregroundColor: Colors.black,
+            ),
+          );
+        }).toList(),
+      ),
+      const SizedBox(
+        width: 30,
+      ),
+      DropdownMenu<LanguageLabel>(
+        initialSelection: myOption,
+        controller: languageController2,
+        requestFocusOnTap: false,
+        label: const Text('Language'),
+        onSelected: (LanguageLabel? language) {
+          setState(() {
+            option.test2(language!);
+          });
+        },
+        dropdownMenuEntries: LanguageLabel.values
+            .map<DropdownMenuEntry<LanguageLabel>>((LanguageLabel label) {
+          return DropdownMenuEntry<LanguageLabel>(
+            value: label,
+            label: label.label,
+            enabled: label.label != "None",
+            style: MenuItemButton.styleFrom(
+              foregroundColor: Colors.black,
+            ),
+          );
+        }).toList(),
+      ),
+    ]);
   } //build
 }
 
@@ -98,8 +133,8 @@ class MyFormState extends State<MyForm> {
     super.dispose();
   }
 
-  void setTranslation(String option) async {
-    String getTranslation = await translate(myController.text, option);
+  void setTranslation(String option, String input) async {
+    String getTranslation = await translate(myController.text, option, input);
 
     setState(() {
       translation = getTranslation;
@@ -130,8 +165,11 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
-                // print(myTest.label);
-                setTranslation(myTest.label);
+                print(testProvider._option.label);
+                print(testProvider._option2.label);
+                // setTranslation(myTest.label, testProvider._option2.label);
+                setTranslation(
+                    testProvider._option.label, testProvider._option2.label);
                 // print(_myKey.currentState!.myLanguage!.label);
                 showDialog(
                   context: context,
@@ -151,10 +189,11 @@ class MyFormState extends State<MyForm> {
   }
 }
 
-Future<String> translate(String mytext, String option) async {
+Future<String> translate(String mytext, String option, String output) async {
   final gt = SimplyTranslator(EngineType.google);
   // String textResult = await gt.trSimply(mytext, "en", "de");
-  String textResult = await gt.trSimply(mytext, "en", option);
+  String textResult = await gt.trSimply(mytext, option, output);
+  // print(textResult);
   // String textResult = await gt.trSimply("Er läuft schnell.", "de", 'en');
   return textResult;
   //using Googletranslate:
@@ -180,8 +219,8 @@ class Translatepage extends StatelessWidget {
             ),
             const MyForm(),
             const Dropdown(),
-            const SizedBox(height: 20),
-            const Dropdown(),
+            // const SizedBox(height: 20),
+            // const Dropdown(),
           ]))),
     );
   }
