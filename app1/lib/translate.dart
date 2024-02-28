@@ -1,3 +1,4 @@
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplytranslate/simplytranslate.dart';
@@ -13,6 +14,75 @@ enum LanguageLabel {
 
   const LanguageLabel(this.label);
   final String label;
+}
+
+// class Notecard {
+//   String inputlanguage;
+//   String outputLanguage;
+//   String text;
+//   String translation;
+// //  Notecard({Key? key}): super(key: key);
+//   Notecard(
+//       {required this.inputlanguage,
+//       required this.outputLanguage,
+//       required this.text,
+//       required this.translation});
+// }
+class Notecard extends StatelessWidget {
+  const Notecard({super.key});
+//Listview to display cards
+  @override
+  Widget build(BuildContext context) {
+    final testProvider = Provider.of<MyProvider>(context, listen: true);
+
+    return Card(
+        elevation: 0.0,
+        margin: const EdgeInsets.only(
+            left: 32.0, right: 32.0, top: 20.0, bottom: 0.0),
+        color: const Color.fromARGB(0, 237, 237, 237),
+        child: FlipCard(
+            direction: FlipDirection.HORIZONTAL,
+            side: CardSide.FRONT,
+            speed: 1000,
+            front: SizedBox(
+              width: 300,
+              height: 120,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 207, 181, 225),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Begin: ${testProvider._option.label}",
+                        style: Theme.of(context).textTheme.displaySmall),
+                    // Text(testProvider._option2.label,
+                    //     style: Theme.of(context).textTheme.bodyLarge),
+                  ],
+                ),
+              ),
+            ),
+            back: SizedBox(
+              width: 300,
+              height: 120,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF006666),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Back ${testProvider._option2.label}",
+                        style: Theme.of(context).textTheme.displaySmall),
+                    // Text('Click here to flip front',
+                    //     style: Theme.of(context).textTheme.bodyLarge),
+                  ],
+                ),
+              ),
+            )));
+  }
 }
 
 class MyProvider with ChangeNotifier {
@@ -49,10 +119,11 @@ class _DropdownState extends State<Dropdown> {
   @override
   Widget build(BuildContext context) {
     final option = Provider.of<MyProvider>(context, listen: false);
-    final myOption = option.selectedLanguage;
+    // final myOption = option.selectedLanguage;
     return Row(children: [
       DropdownMenu<LanguageLabel>(
-        initialSelection: myOption,
+        initialSelection: LanguageLabel.english,
+        // initialSelection: myOption,
         // onValueChanged: (LanguageLabel newValue) {
         //   optionProvider.selectedOption = newValue;
         // },
@@ -88,7 +159,9 @@ class _DropdownState extends State<Dropdown> {
         width: 30,
       ),
       DropdownMenu<LanguageLabel>(
-        initialSelection: myOption,
+        //bug might occur due clicking on the default
+        initialSelection: LanguageLabel.english,
+        // initialSelection: myOption,
         controller: languageController2,
         requestFocusOnTap: false,
         label: const Text('Language'),
@@ -144,7 +217,7 @@ class MyFormState extends State<MyForm> {
   @override
   Widget build(BuildContext context) {
     final testProvider = Provider.of<MyProvider>(context, listen: false);
-    final myTest = testProvider.selectedLanguage;
+    // final myTest = testProvider.selectedLanguage;
 
     // return Text(selectedOption != null ? selectedOption.name : 'No option selected');
     return Form(
@@ -165,6 +238,10 @@ class MyFormState extends State<MyForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_key.currentState!.validate()) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                //edit()->user story
+                //text wrapping
+                //Prssing done on keyboard should submit form
                 // print(testProvider._option.label);
                 // print(testProvider._option2.label);
                 // setTranslation(myTest.label, testProvider._option2.label);
@@ -206,22 +283,40 @@ class Translatepage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MyProvider(),
-      child: Scaffold(
-          appBar: AppBar(title: const Text("Language Learner")),
-          body: Center(
-              child: Column(children: [
-            ElevatedButton(
-              child: const Text("Go back"),
-              onPressed: () {
-                // translate();
-                Navigator.pop(context);
-              },
-            ),
-            const MyForm(),
-            const Dropdown(),
-            // const SizedBox(height: 20),
-            // const Dropdown(),
-          ]))),
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        //when tapping on screen outside form, it dismisses keyboard
+        child: Scaffold(
+            appBar: AppBar(title: const Text("Language Learner")),
+            body: Container(
+                child: Column(children: [
+              ElevatedButton(
+                child: const Text("Go back"),
+                onPressed: () {
+                  // translate();
+                  Navigator.pop(context);
+                },
+              ),
+              const MyForm(),
+              const Dropdown(),
+              const Notecard(),
+
+              Container(
+                alignment: Alignment.bottomCenter,
+                child: ElevatedButton(
+                    onPressed: () {
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => const Notecard()));
+                      // const Notecard();
+                    },
+                    child: const Text("data")),
+              ),
+              // const SizedBox(height: 20),
+              // const Dropdown(),
+            ]))),
+      ),
     );
   }
 }
