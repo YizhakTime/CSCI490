@@ -10,6 +10,6 @@ My project will use Yolov8 along with Google Translate API to detect images in r
 Timeline:  
 (1/29) -> Installed Flutter and cmd-line tools  
 (1/30) -> Build basic scaffolding for app  
-(2/4) -> Added basic sign-in page 
-(2/10) -> Can Signin/Signup 
+(2/4) -> Added basic sign-in page  
+(2/10) -> Can Signin/Signup  
 (2/20)-> Can translate form text into another language 
