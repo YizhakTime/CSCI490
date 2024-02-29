@@ -16,18 +16,23 @@ enum LanguageLabel {
   final String label;
 }
 
-// class Notecard {
-//   String inputlanguage;
-//   String outputLanguage;
-//   String text;
-//   String translation;
-// //  Notecard({Key? key}): super(key: key);
-//   Notecard(
-//       {required this.inputlanguage,
-//       required this.outputLanguage,
-//       required this.text,
-//       required this.translation});
-// }
+class TranslationProvider with ChangeNotifier {
+  String _inputText = "";
+  String _translatedText = "";
+  String get input => _inputText;
+  String get output => _translatedText;
+
+  void setInput(String value) {
+    _inputText = value;
+    notifyListeners();
+  }
+
+  void setTranslation(String val) {
+    _translatedText = val;
+    notifyListeners();
+  }
+}
+
 class Notecard extends StatelessWidget {
   const Notecard({super.key});
 //Listview to display cards

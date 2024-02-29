@@ -1,4 +1,5 @@
 // import 'package:app1/auth_page.dart';
+import 'dart:ui';
 import 'package:app1/check_auth.dart';
 // import 'package:app1/home.dart';
 // import 'package:app1/home_page.dart';
@@ -14,6 +15,7 @@ import 'firebase_options.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> main() async {
+  DartPluginRegistrant.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
@@ -45,47 +47,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-//   // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Demo',
-//       theme: ThemeData(
-//         //flutter run
-//         //Hot reload = r, state is not lost during reload
-//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-//         useMaterial3: true,
-//       ),
-//       home: const Mywrapper(),
-//     );
-//   }
-// }
-
-// // return MaterialApp(
-// //   title: 'Flutter Demo',
-// //   theme: ThemeData(
-// //     //flutter run
-// //     //Hot reload = r, state is not lost during reload
-// //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-// //     useMaterial3: true,
-// //   ),
-// //   home: const Mywrapper(),
-
-// // const MyHomePage(title: 'Welcome to LanguageLearner'),
-
-// class Mywrapper extends StatelessWidget {
-//   const Mywrapper({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Authenticate();
-//   }
-// }
-
 
   //Future is an async operation which means result will be ready in future
   //When another fxn calls it, it should wait until Future fxn is ready to return
