@@ -22,6 +22,10 @@ class TranslationProvider with ChangeNotifier {
   String get input => _inputText;
   String get output => _translatedText;
 
+  void update(MyProvider myModel) {
+    // Do some custom work based on myModel that may call `notifyListeners`
+  }
+
   void setInput(String value) {
     _inputText = value;
     notifyListeners();
@@ -38,8 +42,10 @@ class Notecard extends StatelessWidget {
 //Listview to display cards
   @override
   Widget build(BuildContext context) {
-    final testProvider = Provider.of<MyProvider>(context, listen: true);
-
+    // final testProvider = Provider.of<MyProvider>(context, listen: true);
+    final language = Provider.of<TranslationProvider>(context, listen: false);
+    // print("HEY:${language._inputText}");
+    // print("No: ${language._translatedText}");
     return Card(
         elevation: 0.0,
         margin: const EdgeInsets.only(
@@ -60,7 +66,8 @@ class Notecard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("Begin: ${testProvider._option.label}",
+                    Text("Begin: ${language._inputText}",
+                        // Text("hello",
                         style: Theme.of(context).textTheme.displaySmall),
                     // Text(testProvider._option2.label,
                     //     style: Theme.of(context).textTheme.bodyLarge),
@@ -79,7 +86,8 @@ class Notecard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("Back ${testProvider._option2.label}",
+                    // Text("Hi",
+                    Text("Back ${language._translatedText}",
                         style: Theme.of(context).textTheme.displaySmall),
                     // Text('Click here to flip front',
                     //     style: Theme.of(context).textTheme.bodyLarge),
@@ -204,6 +212,9 @@ class MyFormState extends State<MyForm> {
   final _key = GlobalKey<FormState>();
   final myController = TextEditingController();
   late String translation = "";
+  late String input = "";
+  // late String input = "";
+  // late String output = "";
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -213,15 +224,25 @@ class MyFormState extends State<MyForm> {
 
   void setTranslation(String option, String input) async {
     String getTranslation = await translate(myController.text, option, input);
-
     setState(() {
       translation = getTranslation;
+      input = myController.text;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final testProvider = Provider.of<MyProvider>(context, listen: false);
+    final formProvider =
+        Provider.of<TranslationProvider>(context, listen: false);
+    // Future<void> sendTranslation(String mytranslation) async {
+    //   setState(() {
+    //     output = mytranslation;
+    //     input = myController.text;
+    //     formProvider._inputText = input;
+    //     formProvider._translatedText = output;
+    //   });
+    // }
     // final myTest = testProvider.selectedLanguage;
 
     // return Text(selectedOption != null ? selectedOption.name : 'No option selected');
@@ -252,6 +273,10 @@ class MyFormState extends State<MyForm> {
                 // setTranslation(myTest.label, testProvider._option2.label);
                 setTranslation(
                     testProvider._option.label, testProvider._option2.label);
+                setState(() {
+                  formProvider.setInput(myController.text);
+                  formProvider.setTranslation(translation);
+                });
                 // print(_myKey.currentState!.myLanguage!.label);
                 showDialog(
                   context: context,
@@ -281,20 +306,28 @@ Future<String> translate(String mytext, String option, String output) async {
   //using Googletranslate:
 }
 
+// List<Notecard> list = [];
+
 class Translatepage extends StatelessWidget {
   const Translatepage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MyProvider()),
+        // ChangeNotifierProxyProvider<MyProvider, TranslationProvider>(
+        //   create: (context) => TranslationProvider(),
+        //   update: (_, myModel, myNotifier) => myNotifier!..update(myModel),
+        // )
+        ChangeNotifierProvider(create: (context) => TranslationProvider())
+      ],
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         //when tapping on screen outside form, it dismisses keyboard
         child: Scaffold(
             appBar: AppBar(title: const Text("Language Learner")),
-            body: Container(
-                child: Column(children: [
+            body: Column(children: [
               ElevatedButton(
                 child: const Text("Go back"),
                 onPressed: () {
@@ -304,23 +337,47 @@ class Translatepage extends StatelessWidget {
               ),
               const MyForm(),
               const Dropdown(),
+
               const Notecard(),
+              // const Notecard(),
+
               Container(
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton(
                     onPressed: () {
+                      // list.add(const Notecard());
+                      // print(list.length);
                       // Navigator.push(
                       //     context,
                       //     MaterialPageRoute(
                       //         builder: (context) => const Notecard()));
                       // const Notecard();
                     },
-                    child: const Text("data")),
+                    child: const Text("Create Notecard")),
               ),
+              // Expanded(
+              //   child: ListView.builder(
+              //     itemCount: list.length,
+              //     itemBuilder: (context, index) {
+              //       return list[index];
+              //     },
+              //   ),
+              // ),
+              // Builder(builder: ((context) {
+              //   if (list.isNotEmpty) {
+              //     for (var i = 0; i < list.length; ++i) {
+              //       print(list[i]);
+              //     }
+              //     return list[0];
+              //   } else {
+              //     return Container();
+              //   }
+              // })),
               // const SizedBox(height: 20),
               // const Dropdown(),
-            ]))),
+            ])),
       ),
+      //),
     );
   }
 }

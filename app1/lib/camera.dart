@@ -54,7 +54,6 @@ class _VisionState extends State<Vision> {
         buttonSize: const Size(56.0, 56.0),
         children: [
           SpeedDialChild(
-            //speed dial child
             child: const Icon(Icons.video_call),
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
@@ -88,6 +87,16 @@ class _VisionState extends State<Vision> {
               setState(() {
                 option = Options.imagev8;
               });
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.exit_to_app),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            label: 'Exit',
+            labelStyle: const TextStyle(fontSize: 18.0),
+            onTap: () {
+              Navigator.pop(context);
             },
           ),
         ],
@@ -128,6 +137,15 @@ class _YoloVideoState extends State<YoloVideo> {
   void initState() {
     super.initState();
     init();
+  }
+
+  String getDetected(List<Map<String, dynamic>> results) {
+    String detectedImageText = '';
+    // results.forEach((element) => print(element['tag']));
+    for (var res in results) {
+      detectedImageText = res['tag'].toString();
+    }
+    return detectedImageText;
   }
 
   init() async {
@@ -232,7 +250,8 @@ class _YoloVideoState extends State<YoloVideo> {
     if (res.isNotEmpty) {
       setState(() {
         results = res;
-        print("This is my ${results}");
+        String output = getDetected(results);
+        print(output);
       });
     }
   } //getFrame
