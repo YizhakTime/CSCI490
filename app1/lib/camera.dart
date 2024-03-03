@@ -440,4 +440,4 @@ class _YoloV8State extends State<YoloV8> {
       );
     }).toList();
   }
-}//Yolov8class
+} //Yolov8class
