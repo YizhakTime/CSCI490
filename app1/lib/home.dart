@@ -50,7 +50,10 @@ class Home extends StatelessWidget {
             )
           ],
           automaticallyImplyLeading: true,
-          title: const Text(appTitle),
+          title: const Text(
+            appTitle,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
           centerTitle: true,
           backgroundColor: const Color(0xff6750a4),
         ),
@@ -86,15 +89,19 @@ class Home extends StatelessWidget {
             ),
           ),
         ),
-        body: Center(
+        body: SingleChildScrollView(
           child: Column(
             children: [
-              const Text(
-                'Welcome To Language Learner!',
-                style: TextStyle(fontSize: 30),
+              const DisplayImage(
+                image: 'images/test1.png',
               ),
-              const Text(
-                  "Press the Translate button to translate anything you want!"),
+              const NoteTitle(label: "My Notecards"),
+              // const Text(
+              //   'Welcome To Language Learner!',
+              //   style: TextStyle(fontSize: 30),
+              // ),
+              // const Text(
+              //     "Press the Translate button to translate anything you want!"),
               Wrap(
                 direction: Axis.vertical,
                 children: List.generate(3, (index) => const Text("hello")),
@@ -133,4 +140,54 @@ class Home extends StatelessWidget {
 
                 ));
   } //build
-}//Home
+} //Home
+
+class NoteTitle extends StatelessWidget {
+  const NoteTitle({
+    super.key,
+    required this.label,
+  });
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Row(
+        children: [
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
+          )),
+          Icon(
+            Icons.notes,
+            color: Colors.red[450],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DisplayImage extends StatelessWidget {
+  const DisplayImage({super.key, required this.image});
+  final String image;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      image,
+      width: 500,
+      height: 200,
+      fit: BoxFit.cover,
+    );
+  }
+}
