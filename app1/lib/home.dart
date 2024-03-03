@@ -23,6 +23,7 @@ class Home extends StatelessWidget {
   final User? user;
   @override
   Widget build(BuildContext context) {
+    // final size = MediaQuery.of(context).size;
     const String appTitle = "Language Learner";
     return Scaffold(
         appBar: AppBar(
@@ -41,7 +42,7 @@ class Home extends StatelessWidget {
                         SignedOutAction((context) {
                           Navigator.of(context).pop();
                         })
-                      ],
+                      ], //actions
                     ),
                   ),
                 );
@@ -85,54 +86,51 @@ class Home extends StatelessWidget {
             ),
           ),
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             children: [
-              Text(
+              const Text(
                 'Welcome To Language Learner!',
                 style: TextStyle(fontSize: 30),
               ),
-              Text("Press the Translate button to translate anything you want!")
+              const Text(
+                  "Press the Translate button to translate anything you want!"),
+              Wrap(
+                direction: Axis.vertical,
+                children: List.generate(3, (index) => const Text("hello")),
+              )
             ],
           ),
         ),
-        floatingActionButton: Row(children: [
-          const Spacer(),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16.0, right: 10.0),
-              child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Vision()),
-                  );
-                },
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xff6750a4),
-                child: const Icon(Icons.camera),
-              ),
-            ),
+        floatingActionButton:
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          // const Spacer(),
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Vision()),
+              );
+            },
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xff6750a4),
+            child: const Icon(Icons.camera),
           ),
           const SizedBox(width: 10),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16.0),
-              child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Translatepage()),
-                  );
-                  // translate();
-                },
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xff6750a4),
-                child: const Icon(Icons.translate),
-              ),
-            ),
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Translatepage()),
+              );
+              // translate();
+            },
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xff6750a4),
+            child: const Icon(Icons.translate),
           ),
-        ]));
-  }
-}
+        ] //children
+
+                ));
+  } //build
+}//Home

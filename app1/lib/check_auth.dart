@@ -20,14 +20,16 @@ class CheckAuthState extends StatelessWidget {
               EmailAuthProvider(),
               GoogleProvider(
                   clientId:
-                      "177920090403-9cj3h62c4qn337hn6sr7dp7j2nsdgq7h.apps.googleusercontent.com"), // new
+                      "177920090403-9cj3h62c4qn337hn6sr7dp7j2nsdgq7h.apps.googleusercontent.com"),
             ],
             headerBuilder: (context, constraints, shrinkOffset) {
-              return const Padding(
-                padding: EdgeInsets.all(20),
+              return Padding(
+                padding: const EdgeInsets.all(20),
                 child: AspectRatio(
                   aspectRatio: 1,
-                  // child: Image.asset('flutterfire_300x.png'),
+                  child: Image.network(
+                      "https://static.vecteezy.com/system/resources/previews/005/567/686/original/translator-icon-logo-two-squares-and-arrow-translate-symbol-isolated-on-white-background-language-translation-icon-free-vector.jpg"),
+                  // child: Image.asset('favicon.png'),
                 ),
               );
             },
@@ -35,8 +37,9 @@ class CheckAuthState extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: action == AuthAction.signIn
-                    ? const Text('Welcome to FlutterFire, please sign in!')
-                    : const Text('Welcome to Flutterfire, please sign up!'),
+                    ? const Text('Welcome to Language Learner, please sign in!')
+                    : const Text(
+                        'Welcome to Language Learner, please sign up!'),
               );
             },
             footerBuilder: (context, action) {
