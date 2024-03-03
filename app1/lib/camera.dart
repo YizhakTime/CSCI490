@@ -69,18 +69,6 @@ class _VisionState extends State<Vision> {
             child: const Icon(Icons.camera),
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            label: 'YoloV8seg on Image',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () {
-              setState(() {
-                option = Options.imagev8seg;
-              });
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.camera),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
             label: 'YoloV8 on Image',
             labelStyle: const TextStyle(fontSize: 18.0),
             onTap: () {
@@ -105,9 +93,9 @@ class _VisionState extends State<Vision> {
   }
 
   Widget task(Options option) {
-    // if (option == Options.imagev8) {
-    //   return YoloV8Image(vision: vision);
-    // }
+    if (option == Options.imagev8) {
+      return YoloV8(vision: vision);
+    }
     // if (option == Options.imagev8seg) {
     //   return YoloV8ImageDetect(vision: vision);
     // }
@@ -308,4 +296,148 @@ class _YoloVideoState extends State<YoloVideo> {
       );
     }).toList();
   } //display
-}//YoloCamera Widget end
+} //YoloCamera Widget end
+
+class YoloV8 extends StatefulWidget {
+  final FlutterVision vision;
+  const YoloV8({super.key, required this.vision});
+
+  @override
+  State<YoloV8> createState() => _YoloV8State();
+}
+
+class _YoloV8State extends State<YoloV8> {
+  late List<Map<String, dynamic>> picresults;
+  File? image;
+  int imgHeight = 1;
+  int imgWidth = 1;
+  bool loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadYoloModel().then((value) {
+      setState(() {
+        picresults = [];
+        loaded = true;
+      });
+    });
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size mysize = MediaQuery.of(context).size;
+    if (!loaded) {
+      return const Scaffold(
+        body: Center(
+          child: Text("Model is not loaded, waiting for it."),
+        ),
+      );
+    } //loaded
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        image != null ? Image.file(image!) : const SizedBox(),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                  onPressed: chooseImage,
+                  child: const Text("Select an image.")),
+              ElevatedButton(
+                  onPressed: yoloOnImage, child: const Text("Detect."))
+            ],
+          ),
+        ),
+        ...displayBoxesatObjects(mysize),
+      ],
+    );
+  } //build
+
+  Future<void> loadYoloModel() async {
+    await widget.vision.loadYoloModel(
+        modelPath: 'assets/yolov8n.tflite',
+        labels: 'assets/labels.txt',
+        modelVersion: "yolov8",
+        useGpu: true,
+        numThreads: 2,
+        quantization: false);
+    setState(() {
+      loaded = true;
+    });
+  } //loadModel
+
+  Future<void> chooseImage() async {
+    final ImagePicker pick = ImagePicker();
+    final XFile? photo = await pick.pickImage(source: ImageSource.gallery);
+    if (photo != null) {
+      setState(() {
+        image = File(photo.path);
+      });
+    } //photo
+  } //chooseImage
+
+  yoloOnImage() async {
+    picresults.clear();
+    Uint8List byte = await image!.readAsBytes();
+    final testImg = await decodeImageFromList(byte);
+    imgHeight = testImg.height;
+    imgWidth = testImg.width;
+    final res = await widget.vision.yoloOnImage(
+        bytesList: byte,
+        imageHeight: testImg.height,
+        imageWidth: testImg.width,
+        iouThreshold: 0.8,
+        confThreshold: 0.4,
+        classThreshold: 0.5);
+
+    if (res.isNotEmpty) {
+      setState(() {
+        picresults = res;
+      });
+    } //not empty
+  } //yoloonImage
+
+  List<Widget> displayBoxesatObjects(Size screen) {
+    if (picresults.isEmpty) {
+      return [];
+    }
+
+    double factorX = screen.width / (imgWidth);
+    double imgRatio = imgWidth / imgHeight;
+    double newWidth = imgWidth * factorX;
+    double newHeight = newWidth / imgRatio;
+    double factorY = newHeight / (imgHeight);
+    double pady = (screen.height - newHeight) / 2;
+    Color pickcolor = const Color.fromARGB(255, 50, 233, 30);
+    return picresults.map((result) {
+      return Positioned(
+        left: result["box"][0] * factorX,
+        top: result["box"][1] * factorY + pady,
+        width: (result["box"][2] - result["box"][0]) * factorX,
+        height: (result["box"][3] - result["box"][1]) * factorY,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            border: Border.all(color: Colors.pink, width: 2.0),
+          ),
+          child: Text(
+              "${result['tag']} ${(result['box'][4] * 100).toStringAsFixed(0)}%",
+              style: TextStyle(
+                background: Paint()..color = pickcolor,
+                color: Colors.white,
+                fontSize: 18.0,
+              )),
+        ),
+      );
+    }).toList();
+  }
+}//Yolov8class
