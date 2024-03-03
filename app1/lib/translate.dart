@@ -43,7 +43,7 @@ class Notecard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final testProvider = Provider.of<MyProvider>(context, listen: true);
-    final language = Provider.of<TranslationProvider>(context, listen: false);
+    final language = Provider.of<TranslationProvider>(context, listen: true);
     // print("HEY:${language._inputText}");
     // print("No: ${language._translatedText}");
     return Card(
@@ -337,7 +337,6 @@ class Translatepage extends StatelessWidget {
               ),
               const MyForm(),
               const Dropdown(),
-
               const Notecard(),
               // const Notecard(),
 
@@ -355,26 +354,6 @@ class Translatepage extends StatelessWidget {
                     },
                     child: const Text("Create Notecard")),
               ),
-              // Expanded(
-              //   child: ListView.builder(
-              //     itemCount: list.length,
-              //     itemBuilder: (context, index) {
-              //       return list[index];
-              //     },
-              //   ),
-              // ),
-              // Builder(builder: ((context) {
-              //   if (list.isNotEmpty) {
-              //     for (var i = 0; i < list.length; ++i) {
-              //       print(list[i]);
-              //     }
-              //     return list[0];
-              //   } else {
-              //     return Container();
-              //   }
-              // })),
-              // const SizedBox(height: 20),
-              // const Dropdown(),
             ])),
       ),
       //),

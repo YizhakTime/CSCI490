@@ -122,7 +122,8 @@ class Home extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Translatepage()),
+                    MaterialPageRoute(
+                        builder: (context) => const Translatepage()),
                   );
                   // translate();
                 },
