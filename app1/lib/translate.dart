@@ -133,7 +133,7 @@ class _DropdownState extends State<Dropdown> {
   Widget build(BuildContext context) {
     final option = Provider.of<MyProvider>(context, listen: false);
     // final myOption = option.selectedLanguage;
-    return Row(children: [
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       DropdownMenu<LanguageLabel>(
         initialSelection: LanguageLabel.english,
         // initialSelection: myOption,
@@ -246,51 +246,59 @@ class MyFormState extends State<MyForm> {
     // final myTest = testProvider.selectedLanguage;
 
     // return Text(selectedOption != null ? selectedOption.name : 'No option selected');
-    return Form(
-      key: _key,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          TextFormField(
-            controller: myController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              return null;
-            },
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Validate returns true if the form is valid, or false otherwise.
-              if (_key.currentState!.validate()) {
-                FocusManager.instance.primaryFocus?.unfocus();
-                //edit()->user story
-                //text wrapping
-                //Prssing done on keyboard should submit form
-                // print(testProvider._option.label);
-                // print(testProvider._option2.label);
-                // setTranslation(myTest.label, testProvider._option2.label);
-                setTranslation(
-                    testProvider._option.label, testProvider._option2.label);
-                setState(() {
-                  formProvider.setInput(myController.text);
-                  formProvider.setTranslation(translation);
-                });
-                // print(_myKey.currentState!.myLanguage!.label);
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: Text(translation),
-                    );
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Form(
+        key: _key,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            TextFormField(
+              controller: myController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Validate returns true if the form is valid, or false otherwise.
+                    if (_key.currentState!.validate()) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      //edit()->user story
+                      //text wrapping
+                      //Prssing done on keyboard should submit form
+                      // print(testProvider._option.label);
+                      // print(testProvider._option2.label);
+                      // setTranslation(myTest.label, testProvider._option2.label);
+                      setTranslation(testProvider._option.label,
+                          testProvider._option2.label);
+                      setState(() {
+                        formProvider.setInput(myController.text);
+                        formProvider.setTranslation(translation);
+                      });
+                      // print(_myKey.currentState!.myLanguage!.label);
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: Text(translation),
+                          );
+                        },
+                      );
+                    }
                   },
-                );
-              }
-            },
-            child: const Text('Submit'),
-          ),
-        ],
+                  child: const Text('Submit'),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -326,35 +334,53 @@ class Translatepage extends StatelessWidget {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         //when tapping on screen outside form, it dismisses keyboard
         child: Scaffold(
-            appBar: AppBar(title: const Text("Language Learner")),
-            body: Column(children: [
-              ElevatedButton(
-                child: const Text("Go back"),
-                onPressed: () {
-                  // translate();
-                  Navigator.pop(context);
-                },
-              ),
-              const MyForm(),
-              const Dropdown(),
-              const Notecard(),
-              // const Notecard(),
+            appBar: AppBar(
+                centerTitle: true,
+                title: const Text(
+                  "Language Learner",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                )),
+            body: SingleChildScrollView(
+              child: Column(children: [
+                // ElevatedButton(
+                //   child: const Text("Go back"),
+                //   onPressed: () {
+                //     // translate();
+                //     Navigator.pop(context);
+                //   },
+                // ),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    "Enter a text to translate.",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontStyle: FontStyle.normal,
+                    ),
+                  ),
+                ),
+                const MyForm(),
+                const Dropdown(),
+                const Notecard(),
+                // const Notecard(),
 
-              Container(
-                alignment: Alignment.bottomCenter,
-                child: ElevatedButton(
-                    onPressed: () {
-                      // list.add(const Notecard());
-                      // print(list.length);
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => const Notecard()));
-                      // const Notecard();
-                    },
-                    child: const Text("Create Notecard")),
-              ),
-            ])),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        // list.add(const Notecard());
+                        // print(list.length);
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => const Notecard()));
+                        // const Notecard();
+                      },
+                      child: const Text("Create Notecard")),
+                ),
+              ]),
+            )),
       ),
       //),
     );

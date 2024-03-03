@@ -161,14 +161,13 @@ class NoteTitle extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  color: Colors.grey[500],
-                ),
+                style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
             ],
           )),
           Icon(
-            Icons.notes,
+            Icons.sticky_note_2,
+            size: 45,
             color: Colors.red[450],
           )
         ],
