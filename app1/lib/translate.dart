@@ -213,6 +213,10 @@ class MyForm extends StatefulWidget {
   }
 }
 
+List<Notecard> addNotecards(int count) {
+  return List<Notecard>.generate(count, (index) => const Notecard());
+}
+
 class MyFormState extends State<MyForm> {
   final _key = GlobalKey<FormState>();
   final myController = TextEditingController();

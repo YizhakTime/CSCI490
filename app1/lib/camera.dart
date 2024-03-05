@@ -5,10 +5,153 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:simplytranslate/simplytranslate.dart';
 
 enum Options { none, imagev5, imagev8, imagev8seg, frame, tesseract, vision }
 
 late List<CameraDescription> cameras;
+// List<Notes> mynotes = [];
+
+enum Languages {
+  spanish("es"),
+  english("en"),
+  german("de"),
+  italian("it"),
+  persian("fa"),
+  turkish("tr"),
+  japanese("ja");
+
+  const Languages(this.language);
+  final String language;
+}
+
+class DisplayTranslation extends StatefulWidget {
+  const DisplayTranslation({super.key});
+
+  @override
+  State<DisplayTranslation> createState() => _DisplayTranslationState();
+}
+
+class _DisplayTranslationState extends State<DisplayTranslation> {
+  final _formKey = GlobalKey<FormState>();
+  final myController = TextEditingController();
+  final TextEditingController languageController = TextEditingController();
+  final TextEditingController outputController = TextEditingController();
+  Languages? myLanguage;
+  Languages? outputLanguage;
+
+  Future<String> translate(
+      String mytext, String inputLanguage, String outputLanguage) async {
+    final gt = SimplyTranslator(EngineType.google);
+    String textResult =
+        await gt.trSimply(mytext, inputLanguage, outputLanguage);
+    return textResult;
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.translate),
+                    labelText: 'Enter some text',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter text.";
+                    }
+                    return null;
+                  },
+                  controller: myController,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  content: Text(myController.text),
+                                );
+                              });
+                        }
+                      },
+                      child: const Text("Submit Text")),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownMenu<Languages>(
+                        initialSelection: Languages.english,
+                        controller: languageController,
+                        requestFocusOnTap: true,
+                        label: const Text("Choose input Languages"),
+                        dropdownMenuEntries: Languages.values
+                            .map<DropdownMenuEntry<Languages>>(
+                                (Languages value) {
+                          return DropdownMenuEntry<Languages>(
+                            value: value,
+                            label: value.language,
+                          );
+                        }).toList(),
+                        onSelected: (Languages? language) {
+                          setState(() {
+                            myLanguage = language;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownMenu<Languages>(
+                        initialSelection: Languages.english,
+                        controller: outputController,
+                        requestFocusOnTap: true,
+                        label: const Text("Choose input Languages"),
+                        dropdownMenuEntries: Languages.values
+                            .map<DropdownMenuEntry<Languages>>(
+                                (Languages value) {
+                          return DropdownMenuEntry<Languages>(
+                            value: value,
+                            label: value.language,
+                          );
+                        }).toList(),
+                        onSelected: (Languages? language) {
+                          setState(() {
+                            outputLanguage = language;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                )
+              ],
+            )),
+      ],
+    );
+  }
+}
 
 class Vision extends StatefulWidget {
   const Vision({super.key});
@@ -36,8 +179,16 @@ class _VisionState extends State<Vision> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          "Language Learner",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: task(option),
       floatingActionButton: SpeedDial(
+        // heroTag: 'speed-dial-hero-tag',
         //margin bottom
         icon: Icons.menu, //icon on Floating action button
         activeIcon: Icons.close, //icon when menu is expanded on button
@@ -78,15 +229,31 @@ class _VisionState extends State<Vision> {
             },
           ),
           SpeedDialChild(
-            child: const Icon(Icons.exit_to_app),
+            child: const Icon(Icons.translate),
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            label: 'Exit',
+            label: 'Translate Yolov8 Image',
             labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () {
-              Navigator.pop(context);
-            },
+            onTap: () {},
           ),
+          SpeedDialChild(
+            child: const Icon(Icons.g_translate),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            label: 'Translate Yolov8 Video',
+            labelStyle: const TextStyle(fontSize: 18.0),
+            onTap: () {},
+          ),
+          // SpeedDialChild(
+          //   child: const Icon(Icons.exit_to_app),
+          //   backgroundColor: Colors.blue,
+          //   foregroundColor: Colors.white,
+          //   label: 'Exit',
+          //   labelStyle: const TextStyle(fontSize: 18.0),
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //   },
+          // ),
         ],
       ),
     );
@@ -96,13 +263,35 @@ class _VisionState extends State<Vision> {
     if (option == Options.imagev8) {
       return YoloV8(vision: vision);
     }
-    // if (option == Options.imagev8seg) {
-    //   return YoloV8ImageDetect(vision: vision);
-    // }
     if (option == Options.frame) {
       return YoloVideo(myvision: vision);
     }
-    return const Center(child: Text("Choose option"));
+    // return Container();
+    return const Text("Choose option");
+  }
+}
+
+class Picture extends ChangeNotifier {
+  late List<Map<String, dynamic>> picResults;
+  List<Map<String, dynamic>> get pictures => picResults;
+
+  void setPicture(List<Map<String, dynamic>> tmp) {
+    picResults = tmp;
+    notifyListeners();
+  }
+}
+
+class Video extends ChangeNotifier {
+  late List<Map<String, dynamic>> videoResults;
+  List<Map<String, dynamic>> get videos => videoResults;
+
+  void update(Video myModel) {
+    // Do some custom work based on myModel that may call `notifyListeners`
+  }
+
+  void setVideo(List<Map<String, dynamic>> value) {
+    videoResults = value;
+    notifyListeners();
   }
 }
 
@@ -239,6 +428,7 @@ class _YoloVideoState extends State<YoloVideo> {
       setState(() {
         results = res;
         String output = getDetected(results);
+        // AlertDialog(content: Text(output));
         print(output);
       });
     }
@@ -324,6 +514,15 @@ class _YoloV8State extends State<YoloV8> {
     });
   }
 
+  String getDetected(List<Map<String, dynamic>> results) {
+    String detectedImageText = '';
+    // results.forEach((element) => print(element['tag']));
+    for (var res in results) {
+      detectedImageText = res['tag'].toString();
+    }
+    return detectedImageText;
+  }
+
   @override
   void dispose() async {
     super.dispose();
@@ -376,6 +575,7 @@ class _YoloV8State extends State<YoloV8> {
   } //loadModel
 
   Future<void> chooseImage() async {
+    print("NO");
     final ImagePicker pick = ImagePicker();
     final XFile? photo = await pick.pickImage(source: ImageSource.gallery);
     if (photo != null) {
@@ -386,6 +586,7 @@ class _YoloV8State extends State<YoloV8> {
   } //chooseImage
 
   yoloOnImage() async {
+    print("HIII");
     picresults.clear();
     Uint8List byte = await image!.readAsBytes();
     final testImg = await decodeImageFromList(byte);
@@ -401,6 +602,7 @@ class _YoloV8State extends State<YoloV8> {
 
     if (res.isNotEmpty) {
       setState(() {
+        getDetected(res);
         picresults = res;
       });
     } //not empty
