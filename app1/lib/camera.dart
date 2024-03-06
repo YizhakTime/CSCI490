@@ -5,10 +5,140 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:provider/provider.dart';
+import 'package:simplytranslate/simplytranslate.dart';
 
 enum Options { none, imagev5, imagev8, imagev8seg, frame, tesseract, vision }
 
+enum Languages {
+  spanish("es"),
+  english("en"),
+  german("de"),
+  italian("it"),
+  persian("fa"),
+  turkish("tr"),
+  japanese("ja");
+
+  const Languages(this.language);
+  final String language;
+}
+
+class DisplayTranslation extends StatefulWidget {
+  const DisplayTranslation({super.key});
+
+  @override
+  State<DisplayTranslation> createState() => _DisplayTranslationState();
+}
+
+class _DisplayTranslationState extends State<DisplayTranslation> {
+  // final _formKey = GlobalKey<FormState>();
+  // final myController = TextEditingController();
+  final TextEditingController languageController = TextEditingController();
+  final TextEditingController outputController = TextEditingController();
+  Languages? myLanguage = Languages.english;
+  Languages? outputLanguage = Languages.english;
+
+  Future<String> translate(
+      String mytext, String inputLanguage, String outputLanguage) async {
+    final gt = SimplyTranslator(EngineType.google);
+    String textResult =
+        await gt.trSimply(mytext, inputLanguage, outputLanguage);
+    return textResult;
+  }
+
+  // @override
+  // void dispose() {
+  //   // Clean up the controller when the widget is disposed.
+  //   myController.dispose();
+  //   super.dispose();
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 80),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: DropdownMenu<Languages>(
+                    initialSelection: Languages.english,
+                    controller: languageController,
+                    requestFocusOnTap: false,
+                    label: const Text("Choose input language",
+                        style: TextStyle(color: Colors.white)),
+                    dropdownMenuEntries: Languages.values
+                        .map<DropdownMenuEntry<Languages>>((Languages value) {
+                      return DropdownMenuEntry<Languages>(
+                        value: value,
+                        label: value.language,
+                      );
+                    }).toList(),
+                    onSelected: (Languages? language) {
+                      setState(() {
+                        myLanguage = language;
+                        context.read<Dropdown>().setInput(language);
+                      });
+                    },
+                  )),
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: DropdownMenu<Languages>(
+                    initialSelection: Languages.english,
+                    controller: outputController,
+                    requestFocusOnTap: false,
+                    label: const Text(
+                      "Choose output language",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    dropdownMenuEntries: Languages.values
+                        .map<DropdownMenuEntry<Languages>>((Languages value) {
+                      return DropdownMenuEntry<Languages>(
+                        value: value,
+                        label: value.language,
+                      );
+                    }).toList(),
+                    onSelected: (Languages? language) {
+                      setState(() {
+                        outputLanguage = language;
+                        context.read<Dropdown>().setOutput(language);
+                      });
+                    },
+                  )),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class Dropdown extends ChangeNotifier {
+  Languages? _input = Languages.english;
+  Languages? _output = Languages.english;
+  get selectedLanguage => _input;
+  get inputLanguage => _output;
+
+  void setInput(Languages? value) {
+    _input = value;
+    notifyListeners();
+  }
+
+  void setOutput(Languages? val) {
+    _output = val;
+    notifyListeners();
+  }
+}
+
 late List<CameraDescription> cameras;
+Future<String> translate(String mytext, String option, String output) async {
+  final gt = SimplyTranslator(EngineType.google);
+  String textResult = await gt.trSimply(mytext, option, output);
+  return textResult;
+}
 
 class Vision extends StatefulWidget {
   const Vision({super.key});
@@ -19,6 +149,7 @@ class Vision extends StatefulWidget {
 
 class _VisionState extends State<Vision> {
   late FlutterVision vision;
+  bool displayWidget = false;
   Options option = Options.none;
   @override
   void initState() {
@@ -35,59 +166,62 @@ class _VisionState extends State<Vision> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: task(option),
-      floatingActionButton: SpeedDial(
-        //margin bottom
-        icon: Icons.menu, //icon on Floating action button
-        activeIcon: Icons.close, //icon when menu is expanded on button
-        backgroundColor: Colors.black12, //background color of button
-        foregroundColor: Colors.white, //font color, icon color in button
-        activeBackgroundColor:
-            Colors.deepPurpleAccent, //background color when menu is expanded
-        activeForegroundColor: Colors.white,
-        visible: true,
-        closeManually: false,
-        curve: Curves.bounceIn,
-        overlayColor: Colors.black,
-        overlayOpacity: 0.5,
-        buttonSize: const Size(56.0, 56.0),
-        children: [
-          SpeedDialChild(
-            child: const Icon(Icons.video_call),
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            label: 'Yolo on Frame',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () {
-              setState(() {
-                option = Options.frame;
-              });
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.camera),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'YoloV8 on Image',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () {
-              setState(() {
-                option = Options.imagev8;
-              });
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.exit_to_app),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            label: 'Exit',
-            labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
+    return ChangeNotifierProvider<Dropdown>(
+      create: (_) => Dropdown(),
+      child: Scaffold(
+        body: task(option),
+        floatingActionButton: SpeedDial(
+          //margin bottom
+          icon: Icons.menu, //icon on Floating action button
+          activeIcon: Icons.close, //icon when menu is expanded on button
+          backgroundColor: Colors.black12, //background color of button
+          foregroundColor: Colors.white, //font color, icon color in button
+          activeBackgroundColor:
+              Colors.deepPurpleAccent, //background color when menu is expanded
+          activeForegroundColor: Colors.white,
+          visible: true,
+          closeManually: false,
+          curve: Curves.bounceIn,
+          overlayColor: Colors.black,
+          overlayOpacity: 0.5,
+          buttonSize: const Size(56.0, 56.0),
+          children: [
+            SpeedDialChild(
+              child: const Icon(Icons.video_call),
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              label: 'Yolo on Frame',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () {
+                setState(() {
+                  option = Options.frame;
+                });
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.camera),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'YoloV8 on Image',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () {
+                setState(() {
+                  option = Options.imagev8;
+                });
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.exit_to_app),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              label: 'Exit',
+              labelStyle: const TextStyle(fontSize: 18.0),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -120,6 +254,15 @@ class _YoloVideoState extends State<YoloVideo> {
   CameraImage? myImage;
   bool loaded = false;
   bool detected = false;
+  late String translation = "";
+  late String alertTranslation = "";
+
+  void setTranslation(String text, String input, String output) async {
+    String getTranslation = await translate(text, input, output);
+    setState(() {
+      translation = getTranslation;
+    });
+  }
 
   @override
   void initState() {
@@ -128,12 +271,12 @@ class _YoloVideoState extends State<YoloVideo> {
   }
 
   String getDetected(List<Map<String, dynamic>> results) {
-    String detectedImageText = '';
+    String imageText = "";
     // results.forEach((element) => print(element['tag']));
     for (var res in results) {
-      detectedImageText = res['tag'].toString();
+      imageText = res['tag'].toString();
     }
-    return detectedImageText;
+    return imageText;
   }
 
   init() async {
@@ -166,51 +309,78 @@ class _YoloVideoState extends State<YoloVideo> {
       ));
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        AspectRatio(
-          aspectRatio: mycontroller.value.aspectRatio,
-          child: CameraPreview(
-            mycontroller,
-          ),
-        ),
-        ...displayBoxesAroundRecognizedObjects(size),
-        Positioned(
-          bottom: 75,
-          width: MediaQuery.of(context).size.width,
-          child: Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                  width: 5, color: Colors.white, style: BorderStyle.solid),
+    return Consumer<Dropdown>(
+      builder: (context, dropdown, child) => Stack(
+        fit: StackFit.expand,
+        children: [
+          AspectRatio(
+            aspectRatio: mycontroller.value.aspectRatio,
+            child: CameraPreview(
+              mycontroller,
             ),
-            child: detected
-                ? IconButton(
-                    onPressed: () async {
-                      endDetection();
-                    },
-                    icon: const Icon(
-                      Icons.stop,
-                      color: Colors.red,
-                    ),
-                    iconSize: 50,
-                  )
-                : IconButton(
-                    onPressed: () async {
-                      await beginDetection();
-                    },
-                    icon: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    iconSize: 50,
-                  ),
           ),
-        ),
-      ],
+          ...displayBoxesAroundRecognizedObjects(
+              size, dropdown._output!.language),
+          const DisplayTranslation(),
+          AlertDialog(
+              content: Text("Hello ${getDetected(results)}"),
+              // content: FutureBuilder(
+              //   future: translate(
+              //       getDetected(results), "en", dropdown._output!.language),
+              //   builder:
+              //       (BuildContext context, AsyncSnapshot<String> snapshot) {
+              //     if (snapshot.hasData) {
+              //       return Text("Hello ${snapshot.data}");
+              //     } else if (snapshot.hasError) {
+              //       return Text("Error: ${snapshot.error}");
+              //     } else {
+              //       const SizedBox(
+              //         width: 60,
+              //         height: 60,
+              //         child: CircularProgressIndicator(),
+              //       );
+              //       return const Text("Waiting");
+              //     }
+              //   },
+              // ),
+              surfaceTintColor: Colors.transparent),
+          // Container(child: Text("hello${getDetected(results)}")),
+          Positioned(
+            bottom: 75,
+            width: MediaQuery.of(context).size.width,
+            child: Container(
+              height: 80,
+              width: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                    width: 5, color: Colors.white, style: BorderStyle.solid),
+              ),
+              child: detected
+                  ? IconButton(
+                      onPressed: () async {
+                        endDetection();
+                      },
+                      icon: const Icon(
+                        Icons.stop,
+                        color: Colors.red,
+                      ),
+                      iconSize: 50,
+                    )
+                  : IconButton(
+                      onPressed: () async {
+                        await beginDetection();
+                      },
+                      icon: const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      iconSize: 50,
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   } //build
 
@@ -238,8 +408,10 @@ class _YoloVideoState extends State<YoloVideo> {
     if (res.isNotEmpty) {
       setState(() {
         results = res;
-        String output = getDetected(results);
-        print(output);
+        // print(res);
+        // print(results);
+        // String output = getDetected(results);
+        // print(output);
       });
     }
   } //getFrame
@@ -266,7 +438,7 @@ class _YoloVideoState extends State<YoloVideo> {
     });
   }
 
-  List<Widget> displayBoxesAroundRecognizedObjects(Size video) {
+  List<Widget> displayBoxesAroundRecognizedObjects(Size video, String output) {
     if (results.isEmpty) {
       return [];
     }
@@ -275,6 +447,7 @@ class _YoloVideoState extends State<YoloVideo> {
     double yDirection = video.height / (myImage?.width ?? 1);
     Color getColor = const Color.fromARGB(255, 50, 233, 30);
     return results.map((res) {
+      setTranslation(res['tag'], "en", output);
       return Positioned(
         left: res["box"][0] * xDirection,
         top: res["box"][1] * yDirection,
@@ -285,7 +458,7 @@ class _YoloVideoState extends State<YoloVideo> {
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
               border: Border.all(color: Colors.pink, width: 2.0)),
           child: Text(
-            "${res['tag']} ${(res['box'][4] * 100).toStringAsFixed(0)}%",
+            "$translation ${(res['box'][4] * 100).toStringAsFixed(0)}%",
             style: TextStyle(
               background: Paint()..color = getColor,
               color: Colors.white,
@@ -312,6 +485,15 @@ class _YoloV8State extends State<YoloV8> {
   int imgHeight = 1;
   int imgWidth = 1;
   bool loaded = false;
+
+  String getDetected(List<Map<String, dynamic>> results) {
+    String imageText = "";
+    // results.forEach((element) => print(element['tag']));
+    for (var res in results) {
+      imageText = res['tag'].toString();
+    }
+    return imageText;
+  }
 
   @override
   void initState() {
@@ -344,6 +526,9 @@ class _YoloV8State extends State<YoloV8> {
       fit: StackFit.expand,
       children: [
         image != null ? Image.file(image!) : const SizedBox(),
+        AlertDialog(
+          content: Text("Hello ${getDetected(picresults)}"),
+        ),
         Align(
           alignment: Alignment.bottomCenter,
           child: Row(
@@ -402,6 +587,7 @@ class _YoloV8State extends State<YoloV8> {
     if (res.isNotEmpty) {
       setState(() {
         picresults = res;
+        // print(picresults);
       });
     } //not empty
   } //yoloonImage
