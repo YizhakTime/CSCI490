@@ -23,6 +23,66 @@ enum Languages {
   final String language;
 }
 
+class PictureTranslation extends StatefulWidget {
+  const PictureTranslation({super.key});
+
+  @override
+  State<PictureTranslation> createState() => _PictureTranslationState();
+}
+
+class _PictureTranslationState extends State<PictureTranslation> {
+  final TextEditingController outputController = TextEditingController();
+  Languages? outputLanguage = Languages.english;
+
+  Future<String> translate(
+      String mytext, String inputLanguage, String outputLanguage) async {
+    final gt = SimplyTranslator(EngineType.google);
+    String textResult =
+        await gt.trSimply(mytext, inputLanguage, outputLanguage);
+    return textResult;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 80),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: DropdownMenu<Languages>(
+                    initialSelection: Languages.english,
+                    controller: outputController,
+                    requestFocusOnTap: false,
+                    label: const Text(
+                      "Choose output language",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    dropdownMenuEntries: Languages.values
+                        .map<DropdownMenuEntry<Languages>>((Languages value) {
+                      return DropdownMenuEntry<Languages>(
+                        value: value,
+                        label: value.language,
+                      );
+                    }).toList(),
+                    onSelected: (Languages? language) {
+                      setState(() {
+                        outputLanguage = language;
+                        context.read<DropdownPic>().setOutput(language);
+                      });
+                    },
+                  )),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DisplayTranslation extends StatefulWidget {
   const DisplayTranslation({super.key});
 
@@ -133,6 +193,16 @@ class Dropdown extends ChangeNotifier {
   }
 }
 
+class DropdownPic extends ChangeNotifier {
+  Languages? _out = Languages.english;
+  get outLang => _out;
+
+  void setOutput(Languages? val2) {
+    _out = val2;
+    notifyListeners();
+  }
+}
+
 late List<CameraDescription> cameras;
 Future<String> translate(String mytext, String option, String output) async {
   final gt = SimplyTranslator(EngineType.google);
@@ -166,8 +236,11 @@ class _VisionState extends State<Vision> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<Dropdown>(
-      create: (_) => Dropdown(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<Dropdown>(create: (_) => Dropdown()),
+        ChangeNotifierProvider<DropdownPic>(create: (_) => DropdownPic())
+      ],
       child: Scaffold(
         body: task(option),
         floatingActionButton: SpeedDial(
@@ -230,13 +303,35 @@ class _VisionState extends State<Vision> {
     if (option == Options.imagev8) {
       return YoloV8(vision: vision);
     }
-    // if (option == Options.imagev8seg) {
-    //   return YoloV8ImageDetect(vision: vision);
-    // }
     if (option == Options.frame) {
       return YoloVideo(myvision: vision);
     }
-    return const Center(child: Text("Choose option"));
+    // return Container();
+    return const Text("Choose option");
+  }
+}
+
+class Picture extends ChangeNotifier {
+  late List<Map<String, dynamic>> picResults;
+  List<Map<String, dynamic>> get pictures => picResults;
+
+  void setPicture(List<Map<String, dynamic>> tmp) {
+    picResults = tmp;
+    notifyListeners();
+  }
+}
+
+class Video extends ChangeNotifier {
+  late List<Map<String, dynamic>> videoResults;
+  List<Map<String, dynamic>> get videos => videoResults;
+
+  void update(Video myModel) {
+    // Do some custom work based on myModel that may call `notifyListeners`
+  }
+
+  void setVideo(List<Map<String, dynamic>> value) {
+    videoResults = value;
+    notifyListeners();
   }
 }
 
@@ -343,7 +438,7 @@ class _YoloVideoState extends State<YoloVideo> {
               //     }
               //   },
               // ),
-              surfaceTintColor: Colors.transparent),
+              surfaceTintColor: Colors.white),
           // Container(child: Text("hello${getDetected(results)}")),
           Positioned(
             bottom: 75,
@@ -485,6 +580,7 @@ class _YoloV8State extends State<YoloV8> {
   int imgHeight = 1;
   int imgWidth = 1;
   bool loaded = false;
+  late String translation = "";
 
   String getDetected(List<Map<String, dynamic>> results) {
     String imageText = "";
@@ -493,6 +589,13 @@ class _YoloV8State extends State<YoloV8> {
       imageText = res['tag'].toString();
     }
     return imageText;
+  }
+
+  void setTranslation(String text, String input, String output) async {
+    String getTranslation = await translate(text, input, output);
+    setState(() {
+      translation = getTranslation;
+    });
   }
 
   @override
@@ -522,28 +625,32 @@ class _YoloV8State extends State<YoloV8> {
       );
     } //loaded
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        image != null ? Image.file(image!) : const SizedBox(),
-        AlertDialog(
-          content: Text("Hello ${getDetected(picresults)}"),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                  onPressed: chooseImage,
-                  child: const Text("Select an image.")),
-              ElevatedButton(
-                  onPressed: yoloOnImage, child: const Text("Detect."))
-            ],
+    return Consumer<DropdownPic>(
+      builder: (context, pic, child) => Stack(
+        fit: StackFit.expand,
+        children: [
+          image != null ? Image.file(image!) : const SizedBox(),
+          AlertDialog(
+            // content: Text(pic._out!.language),
+            content: Text("Hello ${getDetected(picresults)}"),
           ),
-        ),
-        ...displayBoxesatObjects(mysize),
-      ],
+          const PictureTranslation(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                    onPressed: chooseImage,
+                    child: const Text("Select an image.")),
+                ElevatedButton(
+                    onPressed: yoloOnImage, child: const Text("Detect."))
+              ],
+            ),
+          ),
+          ...displayBoxesatObjects(mysize, pic._out!.language),
+        ],
+      ),
     );
   } //build
 
@@ -586,13 +693,14 @@ class _YoloV8State extends State<YoloV8> {
 
     if (res.isNotEmpty) {
       setState(() {
+        getDetected(res);
         picresults = res;
         // print(picresults);
       });
     } //not empty
   } //yoloonImage
 
-  List<Widget> displayBoxesatObjects(Size screen) {
+  List<Widget> displayBoxesatObjects(Size screen, String src) {
     if (picresults.isEmpty) {
       return [];
     }
@@ -605,6 +713,7 @@ class _YoloV8State extends State<YoloV8> {
     double pady = (screen.height - newHeight) / 2;
     Color pickcolor = const Color.fromARGB(255, 50, 233, 30);
     return picresults.map((result) {
+      setTranslation(result['tag'], "en", src);
       return Positioned(
         left: result["box"][0] * factorX,
         top: result["box"][1] * factorY + pady,
@@ -616,7 +725,7 @@ class _YoloV8State extends State<YoloV8> {
             border: Border.all(color: Colors.pink, width: 2.0),
           ),
           child: Text(
-              "${result['tag']} ${(result['box'][4] * 100).toStringAsFixed(0)}%",
+              "$translation ${(result['box'][4] * 100).toStringAsFixed(0)}%",
               style: TextStyle(
                 background: Paint()..color = pickcolor,
                 color: Colors.white,
