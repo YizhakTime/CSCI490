@@ -10,6 +10,13 @@ class MyUser {
   // MyUser({this.id})
 }
 
+class Notes {
+  final String input;
+  final String output;
+
+  Notes(this.input, this.output);
+}
+
 //String greeting => "Hello";
 
 class Home extends StatelessWidget {
