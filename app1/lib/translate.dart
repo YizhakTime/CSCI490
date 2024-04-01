@@ -22,10 +22,6 @@ class TranslationProvider with ChangeNotifier {
   String get input => _inputText;
   String get output => _translatedText;
 
-  void update(MyProvider myModel) {
-    // Do some custom work based on myModel that may call `notifyListeners`
-  }
-
   void setInput(String value) {
     _inputText = value;
     notifyListeners();
@@ -57,46 +53,38 @@ class Notecard extends StatelessWidget {
               direction: FlipDirection.HORIZONTAL,
               side: CardSide.FRONT,
               speed: 1000,
-              front: Expanded(
-                // width: 300,
-                // height: 120,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 244, 223, 247),
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                          "From: ${testProvider._option.label} => ${language._inputText}",
-                          // Text("hello",
-                          style: Theme.of(context).textTheme.displaySmall),
-                      // Text(testProvider._option2.label,
-                      //     style: Theme.of(context).textTheme.bodyLarge),
-                    ],
-                  ),
+              front: Container(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 244, 223, 247),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                        "From: ${testProvider._option.label} => ${language._inputText}",
+                        // Text("hello",
+                        style: Theme.of(context).textTheme.displaySmall),
+                    // Text(testProvider._option2.label,
+                    //     style: Theme.of(context).textTheme.bodyLarge),
+                  ],
                 ),
               ),
-              back: Expanded(
-                // width: 300,
-                // height: 120,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 244, 223, 247),
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      // Text("Hi",
-                      Text(
-                          "To: ${testProvider._option2.label} => ${language._translatedText}",
-                          style: Theme.of(context).textTheme.displaySmall),
-                      // Text('Click here to flip front',
-                      //     style: Theme.of(context).textTheme.bodyLarge),
-                    ],
-                  ),
+              back: Container(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 244, 223, 247),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    // Text("Hi",
+                    Text(
+                        "To: ${testProvider._option2.label} => ${language._translatedText}",
+                        style: Theme.of(context).textTheme.displaySmall),
+                    // Text('Click here to flip front',
+                    //     style: Theme.of(context).textTheme.bodyLarge),
+                  ],
                 ),
               ))),
     );
@@ -213,10 +201,6 @@ class MyForm extends StatefulWidget {
   }
 }
 
-List<Notecard> addNotecards(int count) {
-  return List<Notecard>.generate(count, (index) => const Notecard());
-}
-
 class MyFormState extends State<MyForm> {
   final _key = GlobalKey<FormState>();
   final myController = TextEditingController();
@@ -323,10 +307,25 @@ Future<String> translate(String mytext, String option, String output) async {
   //using Googletranslate:
 }
 
-// List<Notecard> list = [];
+class Test extends StatelessWidget {
+  final String name;
+  const Test({
+    super.key,
+    this.name = "",
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(name);
+  }
+}
 
 class Translatepage extends StatelessWidget {
-  const Translatepage({super.key});
+  final List<Test> list;
+  const Translatepage({
+    super.key,
+    this.list = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -380,13 +379,9 @@ class Translatepage extends StatelessWidget {
                     alignment: Alignment.bottomCenter,
                     child: ElevatedButton(
                         onPressed: () {
+                          print(list);
+                          // list.add(const Test());
                           // list.add(const Notecard());
-                          // print(list.length);
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => const Notecard()));
-                          // const Notecard();
                         },
                         child: const Text("Create Notecard")),
                   ),

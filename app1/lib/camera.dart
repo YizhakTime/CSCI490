@@ -324,11 +324,6 @@ class Picture extends ChangeNotifier {
 class Video extends ChangeNotifier {
   late List<Map<String, dynamic>> videoResults;
   List<Map<String, dynamic>> get videos => videoResults;
-
-  void update(Video myModel) {
-    // Do some custom work based on myModel that may call `notifyListeners`
-  }
-
   void setVideo(List<Map<String, dynamic>> value) {
     videoResults = value;
     notifyListeners();

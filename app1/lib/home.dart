@@ -120,6 +120,7 @@ class Home extends StatelessWidget {
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           // const Spacer(),
           FloatingActionButton(
+            heroTag: "w",
             onPressed: () {
               Navigator.push(
                 context,
@@ -132,6 +133,7 @@ class Home extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           FloatingActionButton(
+            heroTag: "a",
             onPressed: () {
               Navigator.push(
                 context,
