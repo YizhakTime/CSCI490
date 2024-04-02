@@ -108,6 +108,16 @@ class MyProvider with ChangeNotifier {
   }
 }
 
+class InputFlag extends ChangeNotifier {
+  bool _flag = false;
+  bool get theFlag => _flag;
+
+  set flagState(bool myFlag) {
+    _flag = myFlag;
+    notifyListeners();
+  }
+}
+
 class Dropdown extends StatefulWidget {
   const Dropdown({super.key});
 
@@ -228,6 +238,8 @@ class MyFormState extends State<MyForm> {
     final testProvider = Provider.of<MyProvider>(context, listen: false);
     final formProvider =
         Provider.of<TranslationProvider>(context, listen: false);
+    final flagProvider = Provider.of<InputFlag>(context, listen: false);
+
     // Future<void> sendTranslation(String mytranslation) async {
     //   setState(() {
     //     output = mytranslation;
@@ -262,6 +274,7 @@ class MyFormState extends State<MyForm> {
                   onPressed: () {
                     // Validate returns true if the form is valid, or false otherwise.
                     if (_key.currentState!.validate()) {
+                      flagProvider.flagState = true;
                       FocusManager.instance.primaryFocus?.unfocus();
                       //edit()->user story
                       //text wrapping
@@ -307,21 +320,52 @@ Future<String> translate(String mytext, String option, String output) async {
   //using Googletranslate:
 }
 
-class Test extends StatelessWidget {
-  final String name;
-  const Test({
-    super.key,
-    this.name = "",
-  });
+class Addnotecard extends StatefulWidget {
+  const Addnotecard({super.key});
+
+  @override
+  State<Addnotecard> createState() => _AddnotecardState();
+}
+
+class _AddnotecardState extends State<Addnotecard> {
+  List<Notecard> list = [];
+  void addNoteCard() {
+    setState(() {
+      list.add(const Notecard());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Text(name);
+    final provider = Provider.of<InputFlag>(context, listen: true);
+    return Column(
+      children: [
+        ElevatedButton(
+            onPressed: () {
+              if (provider.theFlag) {
+                print(provider.theFlag);
+                addNoteCard();
+              } else {
+                const Text("Enter a translation");
+              }
+              // print(list.length);
+            },
+            child: const Text("Add notecard")),
+        ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(8),
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              return list[index];
+            }),
+      ],
+    );
   }
 }
 
 class Translatepage extends StatelessWidget {
-  final List<Test> list;
+  final List<Notecard> list;
   const Translatepage({
     super.key,
     this.list = const [],
@@ -336,7 +380,8 @@ class Translatepage extends StatelessWidget {
         //   create: (context) => TranslationProvider(),
         //   update: (_, myModel, myNotifier) => myNotifier!..update(myModel),
         // )
-        ChangeNotifierProvider(create: (context) => TranslationProvider())
+        ChangeNotifierProvider(create: (context) => TranslationProvider()),
+        ChangeNotifierProvider(create: (context) => InputFlag())
       ],
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -349,7 +394,7 @@ class Translatepage extends StatelessWidget {
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 )),
-            body: SingleChildScrollView(
+            body: const SingleChildScrollView(
               child: Column(children: [
                 // ElevatedButton(
                 //   child: const Text("Go back"),
@@ -358,7 +403,7 @@ class Translatepage extends StatelessWidget {
                 //     Navigator.pop(context);
                 //   },
                 // ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
                     "Enter a text to translate.",
@@ -368,24 +413,24 @@ class Translatepage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const MyForm(),
-                const Dropdown(),
-                const Notecard(),
-                // const Notecard(),
-
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          print(list);
-                          // list.add(const Test());
-                          // list.add(const Notecard());
-                        },
-                        child: const Text("Create Notecard")),
-                  ),
+                MyForm(),
+                Dropdown(),
+                SizedBox(
+                  height: 20,
                 ),
+                Addnotecard(),
+                // const Notecard(),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Container(
+                //     alignment: Alignment.bottomCenter,
+                //     child: ElevatedButton(
+                //         onPressed: () {
+                //           list.add(const Notecard());
+                //         },
+                //         child: const Text("Create Notecard")),
+                //   ),
+                // ),
               ]),
             )),
       ),

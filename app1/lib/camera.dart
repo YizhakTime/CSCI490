@@ -230,7 +230,7 @@ class _VisionState extends State<Vision> {
   @override
   void dispose() async {
     super.dispose();
-    await vision.closeTesseractModel();
+    // await vision.closeTesseractModel();
     await vision.closeYoloModel();
   }
 
@@ -263,7 +263,7 @@ class _VisionState extends State<Vision> {
               child: const Icon(Icons.video_call),
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
-              label: 'Yolo on Frame',
+              label: 'YoloV8 Video',
               labelStyle: const TextStyle(fontSize: 18.0),
               onTap: () {
                 setState(() {
@@ -275,7 +275,7 @@ class _VisionState extends State<Vision> {
               child: const Icon(Icons.camera),
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
-              label: 'YoloV8 on Image',
+              label: 'YoloV8 Image',
               labelStyle: const TextStyle(fontSize: 18.0),
               onTap: () {
                 setState(() {
@@ -395,7 +395,7 @@ class _YoloVideoState extends State<YoloVideo> {
     if (!loaded) {
       return const Scaffold(
           body: Center(
-        child: Text("Model is not loaded yet."),
+        child: Text("Model is not loaded."),
       ));
     }
 
@@ -409,31 +409,30 @@ class _YoloVideoState extends State<YoloVideo> {
               mycontroller,
             ),
           ),
-          ...displayBoxesAroundRecognizedObjects(
-              size, dropdown._output!.language),
+          ...displayBoxes(size, dropdown._output!.language),
           const DisplayTranslation(),
-          AlertDialog(
-              content: Text("Hello ${getDetected(results)}"),
-              // content: FutureBuilder(
-              //   future: translate(
-              //       getDetected(results), "en", dropdown._output!.language),
-              //   builder:
-              //       (BuildContext context, AsyncSnapshot<String> snapshot) {
-              //     if (snapshot.hasData) {
-              //       return Text("Hello ${snapshot.data}");
-              //     } else if (snapshot.hasError) {
-              //       return Text("Error: ${snapshot.error}");
-              //     } else {
-              //       const SizedBox(
-              //         width: 60,
-              //         height: 60,
-              //         child: CircularProgressIndicator(),
-              //       );
-              //       return const Text("Waiting");
-              //     }
-              //   },
-              // ),
-              surfaceTintColor: Colors.white),
+          // AlertDialog(
+          //     content: Text("Hello ${getDetected(results)}"),
+          //     surfaceTintColor: Colors.white),
+          // content: FutureBuilder(
+          //   future: translate(
+          //       getDetected(results), "en", dropdown._output!.language),
+          //   builder:
+          //       (BuildContext context, AsyncSnapshot<String> snapshot) {
+          //     if (snapshot.hasData) {
+          //       return Text("Hello ${snapshot.data}");
+          //     } else if (snapshot.hasError) {
+          //       return Text("Error: ${snapshot.error}");
+          //     } else {
+          //       const SizedBox(
+          //         width: 60,
+          //         height: 60,
+          //         child: CircularProgressIndicator(),
+          //       );
+          //       return const Text("Waiting");
+          //     }
+          //   },
+          // ),
           // Container(child: Text("hello${getDetected(results)}")),
           Positioned(
             bottom: 75,
@@ -528,7 +527,7 @@ class _YoloVideoState extends State<YoloVideo> {
     });
   }
 
-  List<Widget> displayBoxesAroundRecognizedObjects(Size video, String output) {
+  List<Widget> displayBoxes(Size video, String output) {
     if (results.isEmpty) {
       return [];
     }
@@ -625,10 +624,10 @@ class _YoloV8State extends State<YoloV8> {
         fit: StackFit.expand,
         children: [
           image != null ? Image.file(image!) : const SizedBox(),
-          AlertDialog(
-            // content: Text(pic._out!.language),
-            content: Text("Hello ${getDetected(picresults)}"),
-          ),
+          // AlertDialog(
+          //   // content: Text(pic._out!.language),
+          //   content: Text("Hello ${getDetected(picresults)}"),
+          // ),
           const PictureTranslation(),
           Align(
             alignment: Alignment.bottomCenter,
