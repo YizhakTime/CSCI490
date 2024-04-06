@@ -16,6 +16,12 @@ enum LanguageLabel {
   final String label;
 }
 
+class Notes {
+  final String text;
+  final String translation;
+  Notes(this.text, this.translation);
+}
+
 class TranslationProvider with ChangeNotifier {
   String _inputText = "";
   String _translatedText = "";
@@ -33,8 +39,11 @@ class TranslationProvider with ChangeNotifier {
   }
 }
 
+// ignore: must_be_immutable
 class Notecard extends StatelessWidget {
-  const Notecard({super.key});
+  String input;
+  String output;
+  Notecard({super.key, required this.input, required this.output});
 //Listview to display cards
   @override
   Widget build(BuildContext context) {
@@ -61,8 +70,8 @@ class Notecard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(
-                        "From: ${testProvider._option.label} => ${language._inputText}",
+                    Text(input,
+                        // "From: ${testProvider._option.label} => ${language._inputText}",
                         // Text("hello",
                         style: Theme.of(context).textTheme.displaySmall),
                     // Text(testProvider._option2.label,
@@ -79,8 +88,8 @@ class Notecard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     // Text("Hi",
-                    Text(
-                        "To: ${testProvider._option2.label} => ${language._translatedText}",
+                    Text(output,
+                        // "To: ${testProvider._option2.label} => ${language._translatedText}",
                         style: Theme.of(context).textTheme.displaySmall),
                     // Text('Click here to flip front',
                     //     style: Theme.of(context).textTheme.bodyLarge),
@@ -202,8 +211,14 @@ class _DropdownState extends State<Dropdown> {
   } //build
 }
 
+typedef CartChangedCallback = Function(String product, bool inCart);
+
 class MyForm extends StatefulWidget {
-  const MyForm({super.key});
+  final ValueChanged<String>? inputText;
+  final ValueChanged<String>? outputText;
+  // final ValueChanged(String text) inputText;
+  // final ValueChanged(String text1)? outputText;
+  const MyForm({super.key, this.inputText, this.outputText});
 
   @override
   MyFormState createState() {
@@ -287,6 +302,12 @@ class MyFormState extends State<MyForm> {
                       setState(() {
                         formProvider.setInput(myController.text);
                         formProvider.setTranslation(translation);
+                        if (widget.inputText != null) {
+                          widget.inputText!(myController.text);
+                        }
+                        if (widget.outputText != null) {
+                          widget.outputText!(translation);
+                        }
                       });
                       // print(_myKey.currentState!.myLanguage!.label);
                       showDialog(
@@ -320,8 +341,11 @@ Future<String> translate(String mytext, String option, String output) async {
   //using Googletranslate:
 }
 
+// ignore: must_be_immutable
 class Addnotecard extends StatefulWidget {
-  const Addnotecard({super.key});
+  late String inputtext;
+  late String outputtext;
+  Addnotecard({super.key, required this.inputtext, required this.outputtext});
 
   @override
   State<Addnotecard> createState() => _AddnotecardState();
@@ -331,7 +355,7 @@ class _AddnotecardState extends State<Addnotecard> {
   List<Notecard> list = [];
   void addNoteCard() {
     setState(() {
-      list.add(const Notecard());
+      list.add(Notecard(input: widget.inputtext, output: widget.outputtext));
     });
   }
 
@@ -364,12 +388,35 @@ class _AddnotecardState extends State<Addnotecard> {
   }
 }
 
-class Translatepage extends StatelessWidget {
-  final List<Notecard> list;
+class Translatepage extends StatefulWidget {
+  // final Function(String text)? inputText;
+  // final Function(String text1)? outputText;
+  // final List<Notecard> list;
   const Translatepage({
     super.key,
-    this.list = const [],
+    // this.inputText,
+    // this.outputText,
+    // this.list = const [],
   });
+
+  @override
+  State<Translatepage> createState() => _TranslatepageState();
+}
+
+class _TranslatepageState extends State<Translatepage> {
+  String input = "";
+  String output = "";
+  void handleDataChanged(String formInput) {
+    setState(() {
+      input = formInput;
+    });
+  }
+
+  void updateOutput(String translation) {
+    setState(() {
+      output = translation;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -394,7 +441,7 @@ class Translatepage extends StatelessWidget {
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 )),
-            body: const SingleChildScrollView(
+            body: SingleChildScrollView(
               child: Column(children: [
                 // ElevatedButton(
                 //   child: const Text("Go back"),
@@ -403,7 +450,7 @@ class Translatepage extends StatelessWidget {
                 //     Navigator.pop(context);
                 //   },
                 // ),
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
                     "Enter a text to translate.",
@@ -413,12 +460,19 @@ class Translatepage extends StatelessWidget {
                     ),
                   ),
                 ),
-                MyForm(),
-                Dropdown(),
-                SizedBox(
+                MyForm(
+                  inputText: handleDataChanged,
+                  outputText: updateOutput,
+                ),
+                const Dropdown(),
+                const SizedBox(
                   height: 20,
                 ),
-                Addnotecard(),
+                Addnotecard(
+                  inputtext: input,
+                  outputtext: output,
+                ),
+                // Text(input),
                 // const Notecard(),
                 // Padding(
                 //   padding: const EdgeInsets.all(8.0),
