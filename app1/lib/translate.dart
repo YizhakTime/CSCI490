@@ -1,4 +1,5 @@
 import 'package:flip_card/flip_card.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplytranslate/simplytranslate.dart';
@@ -43,12 +44,19 @@ class TranslationProvider with ChangeNotifier {
 class Notecard extends StatelessWidget {
   String input;
   String output;
-  Notecard({super.key, required this.input, required this.output});
+  String inLang;
+  String outLang;
+  Notecard(
+      {super.key,
+      required this.input,
+      required this.output,
+      required this.inLang,
+      required this.outLang});
 //Listview to display cards
   @override
   Widget build(BuildContext context) {
-    final testProvider = Provider.of<MyProvider>(context, listen: true);
-    final language = Provider.of<TranslationProvider>(context, listen: true);
+    // final testProvider = Provider.of<MyProvider>(context, listen: true);
+    // final language = Provider.of<TranslationProvider>(context, listen: true);
     // print("HEY:${language._inputText}");
     // print("No: ${language._translatedText}");
     return Padding(
@@ -70,7 +78,7 @@ class Notecard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(input,
+                    Text("inputLang: $inLang\nText: $input",
                         // "From: ${testProvider._option.label} => ${language._inputText}",
                         // Text("hello",
                         style: Theme.of(context).textTheme.displaySmall),
@@ -88,7 +96,7 @@ class Notecard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     // Text("Hi",
-                    Text(output,
+                    Text("outLang: $outLang\nText: $output",
                         // "To: ${testProvider._option2.label} => ${language._translatedText}",
                         style: Theme.of(context).textTheme.displaySmall),
                     // Text('Click here to flip front',
@@ -212,15 +220,17 @@ class _DropdownState extends State<Dropdown> {
 }
 
 typedef LanguageCallback = Function(String formText, String formOutput);
+typedef LabelCallback = Function(String inLang, String outLang);
 
 class MyForm extends StatefulWidget {
   // final ValueSetter<String>? inputText;
   // final ValueSetter<String>? outputText;
   final LanguageCallback? c;
+  final LabelCallback? d;
   // final ValueChanged(String text) inputText;
   // final ValueChanged(String text1)? outputText;
   // const MyForm({super.key, this.inputText, this.outputText, this.c});
-  const MyForm({super.key, this.c});
+  const MyForm({super.key, this.c, this.d});
 
   @override
   MyFormState createState() {
@@ -303,6 +313,8 @@ class MyFormState extends State<MyForm> {
                           testProvider._option2.label);
                       setState(() {
                         widget.c!(myController.text, translation);
+                        widget.d!(testProvider._option.label,
+                            testProvider._option2.label);
                         formProvider.setInput(myController.text);
                         formProvider.setTranslation(translation);
                         // if (widget.inputText != null) {
@@ -348,7 +360,14 @@ Future<String> translate(String mytext, String option, String output) async {
 class Addnotecard extends StatefulWidget {
   late String inputtext;
   late String outputtext;
-  Addnotecard({super.key, required this.inputtext, required this.outputtext});
+  late String inputLang;
+  late String outputLang;
+  Addnotecard(
+      {super.key,
+      required this.inputtext,
+      required this.outputtext,
+      required this.inputLang,
+      required this.outputLang});
 
   @override
   State<Addnotecard> createState() => _AddnotecardState();
@@ -358,7 +377,12 @@ class _AddnotecardState extends State<Addnotecard> {
   List<Notecard> list = [];
   void addNoteCard() {
     setState(() {
-      list.add(Notecard(input: widget.inputtext, output: widget.outputtext));
+      list.add(Notecard(
+        input: widget.inputtext,
+        output: widget.outputtext,
+        inLang: widget.inputLang,
+        outLang: widget.outputLang,
+      ));
     });
   }
 
@@ -380,9 +404,14 @@ class _AddnotecardState extends State<Addnotecard> {
             ElevatedButton(
               onPressed: () {
                 if (provider.theFlag) {
-                  print(provider.theFlag);
+                  if (kDebugMode) {
+                    print(provider.theFlag);
+                  }
                   addNoteCard();
                 } else {
+                  if (kDebugMode) {
+                    print(provider.theFlag);
+                  }
                   const Text("Enter a translation");
                 }
                 // print(list.length);
@@ -434,6 +463,8 @@ class Translatepage extends StatefulWidget {
 class _TranslatepageState extends State<Translatepage> {
   String input = "";
   String output = "";
+  String inLabel = "";
+  String outLabel = "";
   // void updateInput(String formInput) {
   //   setState(() {
   //     input = formInput;
@@ -458,6 +489,20 @@ class _TranslatepageState extends State<Translatepage> {
       output = out;
     });
     return output;
+  }
+
+  String setInpLang(String firstLabel) {
+    setState(() {
+      inLabel = firstLabel;
+    });
+    return inLabel;
+  }
+
+  String setOutLang(String translationLabel) {
+    setState(() {
+      outLabel = translationLabel;
+    });
+    return outLabel;
   }
 
   @override
@@ -510,6 +555,10 @@ class _TranslatepageState extends State<Translatepage> {
                     // output = formText;
                   },
 
+                  d: (inLang, outLang) {
+                    inLabel = setInpLang(inLang);
+                    outLabel = setOutLang(outLang);
+                  },
                   // inputText: updateInput,
                   // outputText: updateOutput,
                 ),
@@ -520,6 +569,8 @@ class _TranslatepageState extends State<Translatepage> {
                 Addnotecard(
                   inputtext: input,
                   outputtext: output,
+                  inputLang: inLabel,
+                  outputLang: outLabel,
                 ),
               ]),
             )),
