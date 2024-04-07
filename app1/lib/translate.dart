@@ -211,14 +211,16 @@ class _DropdownState extends State<Dropdown> {
   } //build
 }
 
-typedef CartChangedCallback = Function(String product, bool inCart);
+typedef LanguageCallback = Function(String formText, String formOutput);
 
 class MyForm extends StatefulWidget {
-  final ValueChanged<String>? inputText;
-  final ValueChanged<String>? outputText;
+  // final ValueSetter<String>? inputText;
+  // final ValueSetter<String>? outputText;
+  final LanguageCallback? c;
   // final ValueChanged(String text) inputText;
   // final ValueChanged(String text1)? outputText;
-  const MyForm({super.key, this.inputText, this.outputText});
+  // const MyForm({super.key, this.inputText, this.outputText, this.c});
+  const MyForm({super.key, this.c});
 
   @override
   MyFormState createState() {
@@ -300,14 +302,15 @@ class MyFormState extends State<MyForm> {
                       setTranslation(testProvider._option.label,
                           testProvider._option2.label);
                       setState(() {
+                        widget.c!(myController.text, translation);
                         formProvider.setInput(myController.text);
                         formProvider.setTranslation(translation);
-                        if (widget.inputText != null) {
-                          widget.inputText!(myController.text);
-                        }
-                        if (widget.outputText != null) {
-                          widget.outputText!(translation);
-                        }
+                        // if (widget.inputText != null) {
+                        //   widget.inputText!(myController.text);
+                        // }
+                        // if (widget.outputText != null) {
+                        //   widget.outputText!(translation);
+                        // }
                       });
                       // print(_myKey.currentState!.myLanguage!.label);
                       showDialog(
@@ -359,22 +362,47 @@ class _AddnotecardState extends State<Addnotecard> {
     });
   }
 
+  void removeNoteCard() {
+    setState(() {
+      list.remove(list.last);
+      // list.remove(Notecard(input: input, output: output));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<InputFlag>(context, listen: true);
     return Column(
       children: [
-        ElevatedButton(
-            onPressed: () {
-              if (provider.theFlag) {
-                print(provider.theFlag);
-                addNoteCard();
-              } else {
-                const Text("Enter a translation");
-              }
-              // print(list.length);
-            },
-            child: const Text("Add notecard")),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                if (provider.theFlag) {
+                  print(provider.theFlag);
+                  addNoteCard();
+                } else {
+                  const Text("Enter a translation");
+                }
+                // print(list.length);
+              },
+              child: const Text("Add notecard"),
+            ),
+            const SizedBox(
+              width: 15,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  if (list.isNotEmpty) {
+                    removeNoteCard();
+                  } else {
+                    const Text("Error, list is empty");
+                  }
+                },
+                child: const Text("Remove notecard")),
+          ],
+        ),
         ListView.builder(
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
@@ -406,16 +434,30 @@ class Translatepage extends StatefulWidget {
 class _TranslatepageState extends State<Translatepage> {
   String input = "";
   String output = "";
-  void handleDataChanged(String formInput) {
+  // void updateInput(String formInput) {
+  //   setState(() {
+  //     input = formInput;
+  //   });
+  // }
+
+  // void updateOutput(String translation) {
+  //   setState(() {
+  //     output = translation;
+  //   });
+  // }
+
+  String setInput(String inp) {
     setState(() {
-      input = formInput;
+      input = inp;
     });
+    return input;
   }
 
-  void updateOutput(String translation) {
+  String setOutput(String out) {
     setState(() {
-      output = translation;
+      output = out;
     });
+    return output;
   }
 
   @override
@@ -461,8 +503,15 @@ class _TranslatepageState extends State<Translatepage> {
                   ),
                 ),
                 MyForm(
-                  inputText: handleDataChanged,
-                  outputText: updateOutput,
+                  c: (formText, formOutput) {
+                    input = setInput(formText);
+                    output = setOutput(formOutput);
+                    // input = formOutput;
+                    // output = formText;
+                  },
+
+                  // inputText: updateInput,
+                  // outputText: updateOutput,
                 ),
                 const Dropdown(),
                 const SizedBox(
@@ -472,19 +521,6 @@ class _TranslatepageState extends State<Translatepage> {
                   inputtext: input,
                   outputtext: output,
                 ),
-                // Text(input),
-                // const Notecard(),
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: Container(
-                //     alignment: Alignment.bottomCenter,
-                //     child: ElevatedButton(
-                //         onPressed: () {
-                //           list.add(const Notecard());
-                //         },
-                //         child: const Text("Create Notecard")),
-                //   ),
-                // ),
               ]),
             )),
       ),
