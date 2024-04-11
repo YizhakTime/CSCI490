@@ -70,6 +70,7 @@ class Home extends StatelessWidget {
             backgroundColor: Colors.white,
             child: ListView(
               padding: EdgeInsets.zero,
+              shrinkWrap: true,
               children: [
                 const SizedBox(
                   height: 135,
