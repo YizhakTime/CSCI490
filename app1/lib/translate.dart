@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplytranslate/simplytranslate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum LanguageLabel {
   spanish("es"),
@@ -393,6 +395,32 @@ class _AddnotecardState extends State<Addnotecard> {
     });
   }
 
+  Future<DocumentReference> storeNotes(
+      bool flag, String text1, String text2, String text3, String text4) {
+    if (!flag) {
+      throw Exception('Must have text');
+    }
+
+    if (kDebugMode) {
+      print(FirebaseAuth.instance.currentUser!.email);
+    }
+
+    if (list.isEmpty) {
+      throw Exception("Notecard list is empty");
+    }
+
+    //Note, need to consider list of notecards, only save current notecard
+
+    return FirebaseFirestore.instance
+        .collection("translation_notecards")
+        .add(<String, dynamic>{
+      'input_text': text1,
+      'output_text': text2,
+      'inLang': text3,
+      'outLang': text4,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<InputFlag>(context, listen: true);
@@ -419,7 +447,7 @@ class _AddnotecardState extends State<Addnotecard> {
               child: const Text("Add notecard"),
             ),
             const SizedBox(
-              width: 15,
+              width: 10,
             ),
             ElevatedButton(
                 onPressed: () {
@@ -430,6 +458,20 @@ class _AddnotecardState extends State<Addnotecard> {
                   }
                 },
                 child: const Text("Remove notecard")),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  storeNotes(provider.theFlag, widget.inputtext,
+                      widget.outputtext, widget.inputLang, widget.outputLang);
+                },
+                child: const Text("Save Notecard")),
           ],
         ),
         ListView.builder(
