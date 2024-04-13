@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:app1/camera.dart';
 import 'package:app1/translate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,18 +13,12 @@ class MyUser {
   // MyUser({this.id})
 }
 
-class Notes {
-  final String input;
-  final String output;
-
-  Notes(this.input, this.output);
-}
-
-//String greeting => "Hello";
-
+// ignore: must_be_immutable
 class Home extends StatelessWidget {
   Home({super.key, required this.user});
   final FirebaseAuth myuser = FirebaseAuth.instance;
+  // StreamSubscription<QuerySnapshot>? _notecards;
+  // List<Notes> _notes = [];
 
   Future<void> signOut(BuildContext context) async {
     await myuser.signOut();
@@ -49,7 +46,46 @@ class Home extends StatelessWidget {
                         SignedOutAction((context) {
                           Navigator.of(context).pop();
                         })
-                      ], //actions
+                      ],
+                      children: [
+                        StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('translation_notecards')
+                              .snapshots(),
+                          builder: (context,
+                              AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                            if (!streamSnapshot.hasData) {
+                              return const Text("Loading..");
+                            }
+                            return SingleChildScrollView(
+                              physics: const ScrollPhysics(),
+                              child: ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: streamSnapshot.data!.docs.length,
+                                  itemBuilder: (context, index) => Notecard(
+                                      input: streamSnapshot.data!.docs[index]
+                                          ['input_text'],
+                                      output: streamSnapshot.data!.docs[index]
+                                          ['output_text'],
+                                      inLang: streamSnapshot.data!.docs[index]
+                                          ['inLang'],
+                                      outLang: streamSnapshot.data!.docs[index]
+                                          ['outLang'])
+
+                                  // Text(
+                                  //     streamSnapshot.data!.docs[index]
+                                  //         ['input_text']),
+                                  ),
+                            );
+                          },
+                        )
+                        // ElevatedButton(
+                        //     onPressed: getData,
+                        //     child: const Text("Enter data")
+
+                        //     ),
+                      ],
                     ),
                   ),
                 );
