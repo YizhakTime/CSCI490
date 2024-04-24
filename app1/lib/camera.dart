@@ -210,6 +210,7 @@ Future<String> translate(String mytext, String option, String output) async {
   return textResult;
 }
 
+//Start of entire class
 class Vision extends StatefulWidget {
   const Vision({super.key});
 
@@ -576,7 +577,7 @@ class _YoloV8State extends State<YoloV8> {
   bool loaded = false;
   late String translation = "";
 
-  String getDetected(List<Map<String, dynamic>> results) {
+  String getResults(List<Map<String, dynamic>> results) {
     String imageText = "";
     // results.forEach((element) => print(element['tag']));
     for (var res in results) {
@@ -687,7 +688,7 @@ class _YoloV8State extends State<YoloV8> {
 
     if (res.isNotEmpty) {
       setState(() {
-        getDetected(res);
+        getResults(res);
         picresults = res;
         // print(picresults);
       });
