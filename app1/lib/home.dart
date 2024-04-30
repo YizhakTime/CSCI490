@@ -14,6 +14,44 @@ class MyUser {
   // MyUser({this.id})
 }
 
+class MyNotes extends ChangeNotifier {
+  bool flag = false;
+  String srcString = "";
+  String tarString = "";
+  String srcLang = "en";
+  String tarLang = "";
+  bool get myflag => flag;
+  String get selSrc => srcString;
+  String get selTar => tarString;
+  String get selSrcLang => srcLang;
+  String get selTarLang => tarLang;
+
+  void setSrc(String tmpSrc) {
+    srcString = tmpSrc;
+    notifyListeners();
+  }
+
+  void setTar(String tmpTar) {
+    tarString = tmpTar;
+    notifyListeners();
+  }
+
+  void setSrcLang(String tmpSrcLang) {
+    srcLang = tmpSrcLang;
+    notifyListeners();
+  }
+
+  void setTarLang(String tmpTarLang) {
+    tarLang = tmpTarLang;
+    notifyListeners();
+  }
+
+  void setFlag(bool tmp) {
+    flag = tmp;
+    notifyListeners();
+  }
+}
+
 class FlagProvider with ChangeNotifier {
   bool flag = true;
   bool get myFlag => flag;
@@ -35,192 +73,284 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final FirebaseAuth myuser = FirebaseAuth.instance;
-
   bool flag = true;
+  List<Notecard> list = [];
+
+  void addNoteCard(String t1, String t2, String t3, String t4, bool state) {
+    setState(() {
+      if (state) {
+        list.add(Notecard(
+          input: t1,
+          output: t2,
+          inLang: t3,
+          outLang: t4,
+        ));
+      } else {
+        const AlertDialog(
+          title: Text('AlertDialog Title'),
+        );
+      }
+    });
+  }
+
+  void removeNoteCard() {
+    setState(() {
+      list.remove(list.last);
+      // list.remove(Notecard(input: input, output: output));
+    });
+  }
 
   // StreamSubscription<QuerySnapshot>? _notecards;
   Future<void> signOut(BuildContext context) async {
     await myuser.signOut();
   }
 
+  // Future<void> getVisionData(BuildContext context) async {
+  //   final path = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => const Vision()),
+  //   );
+  //   if (!context.mounted) return;
+
+  //   ScaffoldMessenger.of(context)
+  //     ..removeCurrentSnackBar()
+  //     ..showSnackBar(SnackBar(content: Text('$path')));
+  // }
+
   @override
   Widget build(BuildContext context) {
     // final size = MediaQuery.of(context).size;
     const String appTitle = "Language Learner";
-    return Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.person),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<ProfileScreen>(
-                      builder: (context) =>
-                          ChangeNotifierProvider<FlagProvider>(
-                        create: (context) => FlagProvider(),
-                        builder: (context, child) => ProfileScreen(
-                          appBar: AppBar(
-                            title: const Text('User Profile'),
-                          ),
-                          actions: [
-                            SignedOutAction((context) {
-                              Navigator.of(context).pop();
-                            })
-                          ],
-                          children: [
-                            ElevatedButton(
-                                onPressed: () => setState(() {
-                                      flag = !flag;
-                                      Provider.of<FlagProvider>(context,
-                                              listen: false)
-                                          .setFlag(flag);
-                                    }),
-                                child: const Text("Hide or Show")),
-                            Visibility(
-                              visible: context.watch<FlagProvider>().flag,
-                              child: StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection('translation_notecards')
-                                    .snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot>
-                                        streamSnapshot) {
-                                  if (!streamSnapshot.hasData) {
-                                    return const Text("Loading..");
-                                  }
-                                  return SingleChildScrollView(
-                                    physics: const ScrollPhysics(),
-                                    child: ListView.builder(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount:
-                                            streamSnapshot.data!.docs.length,
-                                        itemBuilder: (context, index) =>
-                                            Notecard(
-                                                input: streamSnapshot.data!
-                                                    .docs[index]['input_text'],
-                                                output: streamSnapshot.data!
-                                                    .docs[index]['output_text'],
-                                                inLang: streamSnapshot.data!
-                                                    .docs[index]['inLang'],
-                                                outLang: streamSnapshot.data!
-                                                    .docs[index]['outLang'])
-
-                                        // Text(
-                                        //     streamSnapshot.data!.docs[index]
-                                        //         ['input_text']),
-                                        ),
-                                  );
-                                },
-                              ),
-                            )
-                            // ElevatedButton(
-                            //     onPressed: getData,
-                            //     child: const Text("Enter data")
-
-                            //     ),
-                          ],
+    return
+        // ChangeNotifierProvider<MyNotes>(
+        //   create: (_) => MyNotes(),
+        //   builder: (context, child) =>
+        // child:
+        Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute<ProfileScreen>(
+                    builder: (context) => ChangeNotifierProvider<FlagProvider>(
+                      create: (context) => FlagProvider(),
+                      builder: (context, child) => ProfileScreen(
+                        appBar: AppBar(
+                          title: const Text('User Profile'),
                         ),
+                        actions: [
+                          SignedOutAction((context) {
+                            Navigator.of(context).pop();
+                          })
+                        ],
+                        children: [
+                          ElevatedButton(
+                              onPressed: () => setState(() {
+                                    flag = !flag;
+                                    Provider.of<FlagProvider>(context,
+                                            listen: false)
+                                        .setFlag(flag);
+                                  }),
+                              child: const Text("Hide or Show")),
+                          Visibility(
+                            visible: context.watch<FlagProvider>().flag,
+                            child: StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('translation_notecards')
+                                  .snapshots(),
+                              builder: (context,
+                                  AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                                if (!streamSnapshot.hasData) {
+                                  return const Text("Loading..");
+                                }
+                                return SingleChildScrollView(
+                                  physics: const ScrollPhysics(),
+                                  child: ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          streamSnapshot.data!.docs.length,
+                                      itemBuilder: (context, index) => Notecard(
+                                          input: streamSnapshot
+                                              .data!.docs[index]['input_text'],
+                                          output: streamSnapshot
+                                              .data!.docs[index]['output_text'],
+                                          inLang: streamSnapshot
+                                              .data!.docs[index]['inLang'],
+                                          outLang: streamSnapshot
+                                              .data!.docs[index]['outLang'])
+
+                                      // Text(
+                                      //     streamSnapshot.data!.docs[index]
+                                      //         ['input_text']),
+                                      ),
+                                );
+                              },
+                            ),
+                          )
+                          // ElevatedButton(
+                          //     onPressed: getData,
+                          //     child: const Text("Enter data")
+
+                          //     ),
+                        ],
                       ),
-                    ));
-              },
-            )
-          ],
-          automaticallyImplyLeading: true,
-          title: const Text(
-            appTitle,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          backgroundColor: const Color(0xff6750a4),
-        ),
-        drawer: SizedBox(
-          width: 230,
-          child: Drawer(
-            backgroundColor: Colors.white,
-            child: ListView(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              children: [
-                const SizedBox(
-                  height: 135,
-                  child: DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Color(0xff6750a4),
                     ),
-                    child: Text(
-                      "Options",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                      ),
+                  ));
+            },
+          )
+        ],
+        automaticallyImplyLeading: true,
+        title: const Text(
+          appTitle,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color(0xff6750a4),
+      ),
+      drawer: SizedBox(
+        width: 230,
+        child: Drawer(
+          backgroundColor: Colors.white,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            children: [
+              const SizedBox(
+                height: 135,
+                child: DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Color(0xff6750a4),
+                  ),
+                  child: Text(
+                    "Options",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
                     ),
                   ),
                 ),
-                ListTile(
-                    title: const Text("Sign-out"),
-                    leading: const Icon(Icons.logout),
-                    onTap: () {
-                      signOut(context);
-                    }),
-              ],
-            ),
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const DisplayImage(
-                image: 'images/test1.png',
               ),
-              const NoteTitle(label: "My Notecards"),
-              // const Text(
-              //   'Welcome To Language Learner!',
-              //   style: TextStyle(fontSize: 30),
-              // ),
-              // const Text(
-              //     "Press the Translate button to translate anything you want!"),
-              Wrap(
-                direction: Axis.vertical,
-                children: List.generate(3, (index) => const Text("hello")),
-              )
+              ListTile(
+                  title: const Text("Sign-out"),
+                  leading: const Icon(Icons.logout),
+                  onTap: () {
+                    signOut(context);
+                  }),
             ],
           ),
         ),
-        floatingActionButton:
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          // const Spacer(),
-          FloatingActionButton(
-            heroTag: "w",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Vision()),
-              );
-            },
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xff6750a4),
-            child: const Icon(Icons.camera),
-          ),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-            heroTag: "a",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Translatepage()),
-              );
-              // translate();
-            },
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xff6750a4),
-            child: const Icon(Icons.translate),
-          ),
-        ] //children
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const DisplayImage(
+              image: 'images/test1.png',
+            ),
+            const NoteTitle(label: "My Notecards"),
+            // const Text(
+            //   'Welcome To Language Learner!',
+            //   style: TextStyle(fontSize: 30),
+            // ),
+            // const Text(
+            //     "Press the Translate button to translate anything you want!"),
+            // Wrap(
+            //   direction: Axis.vertical,
+            //   children: List.generate(3, (index) => const Text("hello")),
+            // ),
+            ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(8),
+                itemCount: list.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return list[index];
+                }),
+            // Text("Hi ${context.watch<MyNotes>().selTarLang}"),
+          ],
+        ),
+      ),
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const SizedBox(
+          width: 15,
+        ),
+        // const Spacer(),
+        FloatingActionButton(
+          heroTag: "w",
+          onPressed: () {
+            // getVisionData(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Vision()),
+            );
+          },
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xff6750a4),
+          child: const Icon(Icons.camera),
+        ),
+        const SizedBox(width: 10),
+        FloatingActionButton(
+          heroTag: "a",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Translatepage()),
+            );
+            // translate();
+          },
+          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xff6750a4),
+          child: const Icon(Icons.translate),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            addNoteCard(
+                Provider.of<MyNotes>(context, listen: false).selSrc,
+                Provider.of<MyNotes>(context, listen: false).selTar,
+                Provider.of<MyNotes>(context, listen: false).selSrcLang,
+                Provider.of<MyNotes>(context, listen: false).selTarLang,
+                Provider.of<MyNotes>(context, listen: false).myflag
 
-                ));
+                // "e", "a", "e", "a", true
+
+                // context.watch<MyNotes>().selSrc,
+                // context.watch<MyNotes>().selTar,
+                // "en",
+                // context.watch<MyNotes>().selTarLang,
+                // context.watch<MyNotes>().flag
+
+                );
+
+            // print(list.length);
+          },
+          child: const Text("Add card"),
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        SizedBox(
+          width: 100,
+          child: FloatingActionButton(
+              heroTag: "nfe",
+              onPressed: () {
+                if (list.isNotEmpty) {
+                  removeNoteCard();
+                } else {
+                  const Text("Error, list is empty");
+                }
+              },
+              child: const Text("Remove Card")),
+        ),
+      ] //children
+
+              // )
+              ),
+    );
   }
 } //Home
 

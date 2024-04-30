@@ -1,6 +1,7 @@
 // import 'package:app1/auth_page.dart';
 import 'dart:ui';
 import 'package:app1/check_auth.dart';
+import 'package:app1/home.dart';
 // import 'package:app1/home.dart';
 // import 'package:app1/home_page.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
 // import 'package:async/async.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 // import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 // import 'package:translator/translator.dart';
@@ -38,14 +40,17 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(color: Color(0xff6750a4)),
-        scaffoldBackgroundColor: Colors.white,
+    return ChangeNotifierProvider<MyNotes>(
+      create: (_) => MyNotes(),
+      child: MaterialApp(
+        theme: ThemeData(
+          // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          appBarTheme: const AppBarTheme(color: Color(0xff6750a4)),
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        home: const CheckAuthState(),
       ),
-      home: const CheckAuthState(),
     );
   }
 }

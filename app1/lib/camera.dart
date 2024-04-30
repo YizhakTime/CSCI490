@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:app1/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vision/flutter_vision.dart';
 import 'dart:io';
@@ -221,6 +222,7 @@ class _VisionState extends State<Vision> {
   late FlutterVision vision;
   bool displayWidget = false;
   Options option = Options.none;
+  // String myinput = "";
   @override
   void initState() {
     super.initState();
@@ -233,6 +235,13 @@ class _VisionState extends State<Vision> {
     // await vision.closeTesseractModel();
     await vision.closeYoloModel();
   }
+
+  // String setInput(String inp) {
+  //   setState(() {
+  //     myinput = inp;
+  //   });
+  //   return myinput;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -291,6 +300,8 @@ class _VisionState extends State<Vision> {
               labelStyle: const TextStyle(fontSize: 18.0),
               onTap: () {
                 Navigator.pop(context);
+
+                // Navigator.pop(context, myinput);
               },
             ),
           ],
@@ -301,7 +312,12 @@ class _VisionState extends State<Vision> {
 
   Widget task(Options option) {
     if (option == Options.imagev8) {
-      return YoloV8(vision: vision);
+      return YoloV8(
+        vision: vision,
+        // values: (input) {
+        //   myinput = setInput(input);
+        // },
+      );
     }
     if (option == Options.frame) {
       return YoloVideo(myvision: vision);
@@ -560,8 +576,12 @@ class _YoloVideoState extends State<YoloVideo> {
   } //display
 } //YoloCamera Widget end
 
+// typedef VisionCallback = Function(String input);
+
 class YoloV8 extends StatefulWidget {
   final FlutterVision vision;
+  // final VisionCallback? values;
+  // const YoloV8({super.key, required this.vision, this.values});
   const YoloV8({super.key, required this.vision});
 
   @override
@@ -575,6 +595,7 @@ class _YoloV8State extends State<YoloV8> {
   int imgWidth = 1;
   bool loaded = false;
   late String translation = "";
+  // String input = "";
 
   String getDetected(List<Map<String, dynamic>> results) {
     String imageText = "";
@@ -585,11 +606,22 @@ class _YoloV8State extends State<YoloV8> {
     return imageText;
   }
 
+  // void getInput() {
+  //   if (picresults.isNotEmpty) {
+  //     setState(() {
+  //       input = picresults[0]['tag'];
+  //       widget.values!(input);
+  //     });
+  //   }
+  // }
+
   void setTranslation(String text, String input, String output) async {
     String getTranslation = await translate(text, input, output);
-    setState(() {
-      translation = getTranslation;
-    });
+    if (mounted) {
+      setState(() {
+        translation = getTranslation;
+      });
+    }
   }
 
   @override
@@ -610,6 +642,8 @@ class _YoloV8State extends State<YoloV8> {
 
   @override
   Widget build(BuildContext context) {
+    final notesProvider = Provider.of<MyNotes>(context, listen: false);
+
     final Size mysize = MediaQuery.of(context).size;
     if (!loaded) {
       return const Scaffold(
@@ -618,6 +652,18 @@ class _YoloV8State extends State<YoloV8> {
         ),
       );
     } //loaded
+
+    void getData(String data) {
+      if (picresults.isNotEmpty) {
+        notesProvider.setFlag(true);
+        notesProvider.setSrc(picresults[0]['tag']);
+        notesProvider.setSrcLang("en");
+        notesProvider.setTar(translation);
+        notesProvider.setTarLang(data);
+      } else {
+        notesProvider.setFlag(false);
+      }
+    }
 
     return Consumer<DropdownPic>(
       builder: (context, pic, child) => Stack(
@@ -632,13 +678,26 @@ class _YoloV8State extends State<YoloV8> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 TextButton(
                     onPressed: chooseImage,
                     child: const Text("Select an image.")),
                 ElevatedButton(
-                    onPressed: yoloOnImage, child: const Text("Detect."))
+                    onPressed: yoloOnImage, child: const Text("Detect.")),
+                const SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                  width: 100,
+                  height: 50,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        getData(pic._out!.language);
+                      },
+                      // notesProvider.setTarLang(pic._out!.language),
+                      child: const Text("Enter")),
+                ),
               ],
             ),
           ),

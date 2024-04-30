@@ -507,18 +507,6 @@ class _TranslatepageState extends State<Translatepage> {
   String output = "";
   String inLabel = "";
   String outLabel = "";
-  // void updateInput(String formInput) {
-  //   setState(() {
-  //     input = formInput;
-  //   });
-  // }
-
-  // void updateOutput(String translation) {
-  //   setState(() {
-  //     output = translation;
-  //   });
-  // }
-
   String setInput(String inp) {
     setState(() {
       input = inp;
