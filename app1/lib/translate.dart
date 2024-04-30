@@ -475,6 +475,7 @@ class _AddnotecardState extends State<Addnotecard> {
           ],
         ),
         ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             padding: const EdgeInsets.all(8),
@@ -559,6 +560,7 @@ class _TranslatepageState extends State<Translatepage> {
                       color: Colors.white, fontWeight: FontWeight.bold),
                 )),
             body: SingleChildScrollView(
+              physics: const ScrollPhysics(),
               child: Column(children: [
                 // ElevatedButton(
                 //   child: const Text("Go back"),

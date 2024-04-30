@@ -246,12 +246,13 @@ class _HomeState extends State<Home> {
         ),
       ),
       body: SingleChildScrollView(
+        physics: const ScrollPhysics(),
         child: Column(
           children: [
             const DisplayImage(
               image: 'images/test1.png',
             ),
-            const NoteTitle(label: "My Notecards"),
+            const NoteTitle(label: "Photo Notecards"),
             // const Text(
             //   'Welcome To Language Learner!',
             //   style: TextStyle(fontSize: 30),
@@ -263,14 +264,13 @@ class _HomeState extends State<Home> {
             //   children: List.generate(3, (index) => const Text("hello")),
             // ),
             ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
-                padding: const EdgeInsets.all(8),
                 itemCount: list.length,
                 itemBuilder: (BuildContext context, int index) {
                   return list[index];
                 }),
-            // Text("Hi ${context.watch<MyNotes>().selTarLang}"),
           ],
         ),
       ),
@@ -279,11 +279,9 @@ class _HomeState extends State<Home> {
         const SizedBox(
           width: 15,
         ),
-        // const Spacer(),
         FloatingActionButton(
           heroTag: "w",
           onPressed: () {
-            // getVisionData(context);
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Vision()),
@@ -301,11 +299,13 @@ class _HomeState extends State<Home> {
               context,
               MaterialPageRoute(builder: (context) => const Translatepage()),
             );
-            // translate();
           },
           foregroundColor: Colors.white,
           backgroundColor: const Color(0xff6750a4),
           child: const Icon(Icons.translate),
+        ),
+        const SizedBox(
+          width: 10,
         ),
         ElevatedButton(
           onPressed: () {
@@ -315,18 +315,12 @@ class _HomeState extends State<Home> {
                 Provider.of<MyNotes>(context, listen: false).selSrcLang,
                 Provider.of<MyNotes>(context, listen: false).selTarLang,
                 Provider.of<MyNotes>(context, listen: false).myflag
-
-                // "e", "a", "e", "a", true
-
                 // context.watch<MyNotes>().selSrc,
                 // context.watch<MyNotes>().selTar,
                 // "en",
                 // context.watch<MyNotes>().selTarLang,
                 // context.watch<MyNotes>().flag
-
                 );
-
-            // print(list.length);
           },
           child: const Text("Add card"),
         ),
@@ -347,8 +341,6 @@ class _HomeState extends State<Home> {
               child: const Text("Remove Card")),
         ),
       ] //children
-
-              // )
               ),
     );
   }
