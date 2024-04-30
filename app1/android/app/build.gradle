@@ -29,7 +29,8 @@ android {
         noCompress 'lite'
     }
     namespace "com.example.app1"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion flutter.compileSdkVersion = 34
+    //compileSdkVersion flutter.compileSdkVersion by default
     ndkVersion flutter.ndkVersion
 
     compileOptions {

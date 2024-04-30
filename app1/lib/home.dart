@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 // import 'package:simplytranslate/simplytranslate.dart';
 
 class MyUser {
@@ -13,18 +14,35 @@ class MyUser {
   // MyUser({this.id})
 }
 
-// ignore: must_be_immutable
-class Home extends StatelessWidget {
-  Home({super.key, required this.user});
-  final FirebaseAuth myuser = FirebaseAuth.instance;
-  // StreamSubscription<QuerySnapshot>? _notecards;
-  // List<Notes> _notes = [];
+class FlagProvider with ChangeNotifier {
+  bool flag = true;
+  bool get myFlag => flag;
 
+  void setFlag(bool myFlag) {
+    flag = myFlag;
+    notifyListeners();
+  }
+}
+
+// ignore: must_be_immutable
+class Home extends StatefulWidget {
+  const Home({super.key, required this.user});
+  final User? user;
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  final FirebaseAuth myuser = FirebaseAuth.instance;
+
+  bool flag = true;
+
+  // StreamSubscription<QuerySnapshot>? _notecards;
   Future<void> signOut(BuildContext context) async {
     await myuser.signOut();
   }
 
-  final User? user;
   @override
   Widget build(BuildContext context) {
     // final size = MediaQuery.of(context).size;
@@ -36,59 +54,77 @@ class Home extends StatelessWidget {
               icon: const Icon(Icons.person),
               onPressed: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute<ProfileScreen>(
-                    builder: (context) => ProfileScreen(
-                      appBar: AppBar(
-                        title: const Text('User Profile'),
+                    context,
+                    MaterialPageRoute<ProfileScreen>(
+                      builder: (context) =>
+                          ChangeNotifierProvider<FlagProvider>(
+                        create: (context) => FlagProvider(),
+                        builder: (context, child) => ProfileScreen(
+                          appBar: AppBar(
+                            title: const Text('User Profile'),
+                          ),
+                          actions: [
+                            SignedOutAction((context) {
+                              Navigator.of(context).pop();
+                            })
+                          ],
+                          children: [
+                            ElevatedButton(
+                                onPressed: () => setState(() {
+                                      flag = !flag;
+                                      Provider.of<FlagProvider>(context,
+                                              listen: false)
+                                          .setFlag(flag);
+                                    }),
+                                child: const Text("Hide or Show")),
+                            Visibility(
+                              visible: context.watch<FlagProvider>().flag,
+                              child: StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection('translation_notecards')
+                                    .snapshots(),
+                                builder: (context,
+                                    AsyncSnapshot<QuerySnapshot>
+                                        streamSnapshot) {
+                                  if (!streamSnapshot.hasData) {
+                                    return const Text("Loading..");
+                                  }
+                                  return SingleChildScrollView(
+                                    physics: const ScrollPhysics(),
+                                    child: ListView.builder(
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount:
+                                            streamSnapshot.data!.docs.length,
+                                        itemBuilder: (context, index) =>
+                                            Notecard(
+                                                input: streamSnapshot.data!
+                                                    .docs[index]['input_text'],
+                                                output: streamSnapshot.data!
+                                                    .docs[index]['output_text'],
+                                                inLang: streamSnapshot.data!
+                                                    .docs[index]['inLang'],
+                                                outLang: streamSnapshot.data!
+                                                    .docs[index]['outLang'])
+
+                                        // Text(
+                                        //     streamSnapshot.data!.docs[index]
+                                        //         ['input_text']),
+                                        ),
+                                  );
+                                },
+                              ),
+                            )
+                            // ElevatedButton(
+                            //     onPressed: getData,
+                            //     child: const Text("Enter data")
+
+                            //     ),
+                          ],
+                        ),
                       ),
-                      actions: [
-                        SignedOutAction((context) {
-                          Navigator.of(context).pop();
-                        })
-                      ],
-                      children: [
-                        StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('translation_notecards')
-                              .snapshots(),
-                          builder: (context,
-                              AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-                            if (!streamSnapshot.hasData) {
-                              return const Text("Loading..");
-                            }
-                            return SingleChildScrollView(
-                              physics: const ScrollPhysics(),
-                              child: ListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: streamSnapshot.data!.docs.length,
-                                  itemBuilder: (context, index) => Notecard(
-                                      input: streamSnapshot.data!.docs[index]
-                                          ['input_text'],
-                                      output: streamSnapshot.data!.docs[index]
-                                          ['output_text'],
-                                      inLang: streamSnapshot.data!.docs[index]
-                                          ['inLang'],
-                                      outLang: streamSnapshot.data!.docs[index]
-                                          ['outLang'])
-
-                                  // Text(
-                                  //     streamSnapshot.data!.docs[index]
-                                  //         ['input_text']),
-                                  ),
-                            );
-                          },
-                        )
-                        // ElevatedButton(
-                        //     onPressed: getData,
-                        //     child: const Text("Enter data")
-
-                        //     ),
-                      ],
-                    ),
-                  ),
-                );
+                    ));
               },
             )
           ],
@@ -185,7 +221,7 @@ class Home extends StatelessWidget {
         ] //children
 
                 ));
-  } //build
+  }
 } //Home
 
 class NoteTitle extends StatelessWidget {
