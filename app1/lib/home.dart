@@ -253,16 +253,6 @@ class _HomeState extends State<Home> {
               image: 'images/test1.png',
             ),
             const NoteTitle(label: "Photo Notecards"),
-            // const Text(
-            //   'Welcome To Language Learner!',
-            //   style: TextStyle(fontSize: 30),
-            // ),
-            // const Text(
-            //     "Press the Translate button to translate anything you want!"),
-            // Wrap(
-            //   direction: Axis.vertical,
-            //   children: List.generate(3, (index) => const Text("hello")),
-            // ),
             ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
