@@ -86,17 +86,24 @@ class _HomeState extends State<Home> {
           outLang: t4,
         ));
       } else {
-        const AlertDialog(
-          title: Text('AlertDialog Title'),
+        final snackBar = SnackBar(
+          content: const Text('Translation does not exist'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {},
+          ),
+          duration: const Duration(milliseconds: 600),
         );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     });
   }
 
   void removeNoteCard() {
     setState(() {
-      list.remove(list.last);
-      // list.remove(Notecard(input: input, output: output));
+      if (list.isNotEmpty) {
+        list.remove(list.last);
+      }
     });
   }
 
@@ -169,21 +176,11 @@ class _HomeState extends State<Home> {
                                           inLang: streamSnapshot
                                               .data!.docs[index]['inLang'],
                                           outLang: streamSnapshot
-                                              .data!.docs[index]['outLang'])
-
-                                      // Text(
-                                      //     streamSnapshot.data!.docs[index]
-                                      //         ['input_text']),
-                                      ),
+                                              .data!.docs[index]['outLang'])),
                                 );
                               },
                             ),
                           )
-                          // ElevatedButton(
-                          //     onPressed: getData,
-                          //     child: const Text("Enter data")
-
-                          //     ),
                         ],
                       ),
                     ),
@@ -312,7 +309,15 @@ class _HomeState extends State<Home> {
                 if (list.isNotEmpty) {
                   removeNoteCard();
                 } else {
-                  const Text("Error, list is empty");
+                  final snackBar = SnackBar(
+                    content: const Text('List is empty'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {},
+                    ),
+                    duration: const Duration(milliseconds: 600),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }
               },
               child: const Text("Remove Card")),

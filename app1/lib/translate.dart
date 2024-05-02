@@ -484,7 +484,15 @@ class _AddnotecardState extends State<Addnotecard> {
                   if (kDebugMode) {
                     print(provider.theFlag);
                   }
-                  const Text("Enter a translation");
+                  final snackBar = SnackBar(
+                    content: const Text('Do not have current translation'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {},
+                    ),
+                    duration: const Duration(milliseconds: 600),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }
                 // print(list.length);
               },
@@ -498,7 +506,15 @@ class _AddnotecardState extends State<Addnotecard> {
                   if (list.isNotEmpty) {
                     removeNoteCard();
                   } else {
-                    const Text("Error, list is empty");
+                    final snackBar = SnackBar(
+                      content: const Text('List is empty'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {},
+                      ),
+                      duration: const Duration(milliseconds: 600),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                 },
                 child: const Text("Remove notecard")),
