@@ -55,7 +55,6 @@ class Notecard extends StatelessWidget {
       required this.output,
       required this.inLang,
       required this.outLang});
-//Listview to display cards
   @override
   Widget build(BuildContext context) {
     // final testProvider = Provider.of<MyProvider>(context, listen: true);
