@@ -100,22 +100,9 @@ class _HomeState extends State<Home> {
     });
   }
 
-  // StreamSubscription<QuerySnapshot>? _notecards;
   Future<void> signOut(BuildContext context) async {
     await myuser.signOut();
   }
-
-  // Future<void> getVisionData(BuildContext context) async {
-  //   final path = await Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => const Vision()),
-  //   );
-  //   if (!context.mounted) return;
-
-  //   ScaffoldMessenger.of(context)
-  //     ..removeCurrentSnackBar()
-  //     ..showSnackBar(SnackBar(content: Text('$path')));
-  // }
 
   @override
   Widget build(BuildContext context) {
