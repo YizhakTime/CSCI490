@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:simplytranslate/simplytranslate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 enum LanguageLabel {
   spanish("es"),
@@ -71,7 +72,7 @@ class Notecard extends StatelessWidget {
           child: FlipCard(
               direction: FlipDirection.HORIZONTAL,
               side: CardSide.FRONT,
-              speed: 1000,
+              speed: 900,
               front: Container(
                 decoration: const BoxDecoration(
                   color: Color.fromARGB(255, 244, 223, 247),
@@ -80,10 +81,28 @@ class Notecard extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("inputLang: $inLang\nText: $input",
-                        // "From: ${testProvider._option.label} => ${language._inputText}",
-                        // Text("hello",
-                        style: Theme.of(context).textTheme.displaySmall),
+                    RichText(
+                      text: TextSpan(
+                          style: GoogleFonts.firaSansExtraCondensed(
+                              textStyle:
+                                  Theme.of(context).textTheme.displaySmall),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: "Base Language: $inLang \n",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: "Text: $input")
+                          ]),
+                    )
+                    // Text("Input Language: $inLang\nText: $input",
+                    //     // "From: ${testProvider._option.label} => ${language._inputText}",
+                    //     // Text("hello",
+                    //     style:
+                    // GoogleFonts.firaSansExtraCondensed(
+                    //         textStyle:
+                    //             Theme.of(context).textTheme.displaySmall)
+                    // ),
                     // Text(testProvider._option2.label,
                     //     style: Theme.of(context).textTheme.bodyLarge),
                   ],
@@ -98,9 +117,25 @@ class Notecard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     // Text("Hi",
-                    Text("outLang: $outLang\nText: $output",
-                        // "To: ${testProvider._option2.label} => ${language._translatedText}",
-                        style: Theme.of(context).textTheme.displaySmall),
+                    // "To: ${testProvider._option2.label} => ${language._translatedText}",
+                    RichText(
+                      text: TextSpan(
+                          style: GoogleFonts.firaSansExtraCondensed(
+                              textStyle:
+                                  Theme.of(context).textTheme.displaySmall),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: "Goal Language: $outLang \n",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: "Translation: $output")
+                          ]),
+                    )
+                    // Text("Target Language: $outLang\nTranslation: $output",
+                    //     style: GoogleFonts.firaSansExtraCondensed(
+                    //         textStyle:
+                    //             Theme.of(context).textTheme.displaySmall)),
                     // Text('Click here to flip front',
                     //     style: Theme.of(context).textTheme.bodyLarge),
                   ],
