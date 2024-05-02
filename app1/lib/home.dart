@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:app1/camera.dart';
 import 'package:app1/translate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 // import 'package:simplytranslate/simplytranslate.dart';
 
@@ -54,10 +54,17 @@ class MyNotes extends ChangeNotifier {
 
 class FlagProvider with ChangeNotifier {
   bool flag = true;
+  bool beginFlag = true;
+  bool get myImageFlag => beginFlag;
   bool get myFlag => flag;
 
   void setFlag(bool myFlag) {
     flag = myFlag;
+    notifyListeners();
+  }
+
+  void setImageFlag(bool tmpFlag) {
+    beginFlag = tmpFlag;
     notifyListeners();
   }
 }
@@ -74,7 +81,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final FirebaseAuth myuser = FirebaseAuth.instance;
   bool flag = true;
+  bool imageflag = true;
   List<Notecard> list = [];
+  int currentIndex = 0;
 
   void addNoteCard(String t1, String t2, String t3, String t4, bool state) {
     setState(() {
@@ -87,7 +96,7 @@ class _HomeState extends State<Home> {
         ));
       } else {
         final snackBar = SnackBar(
-          content: const Text('Translation does not exist'),
+          content: const Text('Image translation does not exist'),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () {},
@@ -104,6 +113,32 @@ class _HomeState extends State<Home> {
       if (list.isNotEmpty) {
         list.remove(list.last);
       }
+    });
+  }
+
+  Future<DocumentReference> storeNotes(
+      String text1, String text2, String text3, String text4, bool flag) {
+    if (!flag) {
+      final snackBar = SnackBar(
+        content: const Text('Translation does not exist'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {},
+        ),
+        duration: const Duration(milliseconds: 600),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      throw Exception("Notecard list is empty");
+    }
+
+    //Note, need to consider list of notecards, only save current notecard
+    return FirebaseFirestore.instance
+        .collection("image_notecards")
+        .add(<String, dynamic>{
+      'src_lang': text1,
+      'src_text': text2,
+      'tar_lang': text3,
+      'tar_text': text4,
     });
   }
 
@@ -127,64 +162,141 @@ class _HomeState extends State<Home> {
             icon: const Icon(Icons.person),
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute<ProfileScreen>(
-                    builder: (context) => ChangeNotifierProvider<FlagProvider>(
-                      create: (context) => FlagProvider(),
-                      builder: (context, child) => ProfileScreen(
-                        appBar: AppBar(
-                          title: const Text('User Profile'),
-                        ),
-                        actions: [
-                          SignedOutAction((context) {
-                            Navigator.of(context).pop();
-                          })
-                        ],
-                        children: [
-                          ElevatedButton(
-                              onPressed: () => setState(() {
-                                    flag = !flag;
-                                    Provider.of<FlagProvider>(context,
-                                            listen: false)
-                                        .setFlag(flag);
-                                  }),
-                              child: const Text("Hide or Show")),
-                          Visibility(
-                            visible: context.watch<FlagProvider>().flag,
-                            child: StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('translation_notecards')
-                                  .snapshots(),
-                              builder: (context,
-                                  AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-                                if (!streamSnapshot.hasData) {
-                                  return const Text("Loading..");
-                                }
-                                return SingleChildScrollView(
-                                  physics: const ScrollPhysics(),
-                                  child: ListView.builder(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount:
-                                          streamSnapshot.data!.docs.length,
-                                      itemBuilder: (context, index) => Notecard(
-                                          input: streamSnapshot
-                                              .data!.docs[index]['input_text'],
-                                          output: streamSnapshot
-                                              .data!.docs[index]['output_text'],
-                                          inLang: streamSnapshot
-                                              .data!.docs[index]['inLang'],
-                                          outLang: streamSnapshot
-                                              .data!.docs[index]['outLang'])),
-                                );
-                              },
-                            ),
-                          )
-                        ],
+                context,
+                MaterialPageRoute<ProfileScreen>(
+                  builder: (context) => ChangeNotifierProvider<FlagProvider>(
+                    create: (context) => FlagProvider(),
+                    builder: (context, child) =>
+                        // child:
+                        ProfileScreen(
+                      appBar: AppBar(
+                        title: const Text('User Profile'),
                       ),
+                      actions: [
+                        SignedOutAction((context) {
+                          Navigator.of(context).pop();
+                        })
+                      ],
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Translation notecards",
+                                style: GoogleFonts.lato(
+                                    textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  fontStyle: FontStyle.normal,
+                                ))),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        // Column(
+                        //   children: [
+                        ElevatedButton(
+                            onPressed: () => setState(() {
+                                  flag = !flag;
+                                  Provider.of<FlagProvider>(context,
+                                          listen: false)
+                                      .setFlag(flag);
+                                }),
+                            child:
+                                const Text("Hide/Show Translation Notecards")),
+                        Visibility(
+                          visible: context.watch<FlagProvider>().flag,
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection('translation_notecards')
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                              if (!streamSnapshot.hasData) {
+                                return const Text("Loading..");
+                              }
+                              return SingleChildScrollView(
+                                physics: const ScrollPhysics(),
+                                child: ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: streamSnapshot.data!.docs.length,
+                                    itemBuilder: (context, index) => Notecard(
+                                        input: streamSnapshot.data!.docs[index]
+                                            ['input_text'],
+                                        output: streamSnapshot.data!.docs[index]
+                                            ['output_text'],
+                                        inLang: streamSnapshot.data!.docs[index]
+                                            ['inLang'],
+                                        outLang: streamSnapshot
+                                            .data!.docs[index]['outLang'])),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Image notecards",
+                                style: GoogleFonts.lato(
+                                    textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  fontStyle: FontStyle.normal,
+                                ))),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                            onPressed: () => setState(() {
+                                  imageflag = !imageflag;
+                                  Provider.of<FlagProvider>(context,
+                                          listen: false)
+                                      .setImageFlag(imageflag);
+                                }),
+                            child: const Text("Hide/Show Image Notecards")),
+                        Visibility(
+                          visible: context.watch<FlagProvider>().beginFlag,
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection('image_notecards')
+                                .snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                              if (!streamSnapshot.hasData) {
+                                return const Text("Loading..");
+                              }
+                              return SingleChildScrollView(
+                                physics: const ScrollPhysics(),
+                                child: ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: streamSnapshot.data!.docs.length,
+                                    itemBuilder: (context, index) => Notecard(
+                                        input: streamSnapshot.data!.docs[index]
+                                            ['src_text'],
+                                        output: streamSnapshot.data!.docs[index]
+                                            ['tar_text'],
+                                        inLang: streamSnapshot.data!.docs[index]
+                                            ['src_lang'],
+                                        outLang: streamSnapshot
+                                            .data!.docs[index]['tar_lang'])),
+                              );
+                            },
+                          ),
+                        )
+                      ],
                     ),
-                  ));
+                  ),
+                ),
+                // ),
+                // )
+              );
             },
           )
         ],
@@ -229,99 +341,171 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const ScrollPhysics(),
-        child: Column(
-          children: [
-            const DisplayImage(
-              image: 'images/test1.png',
+      bottomNavigationBar: SizedBox(
+        height: 90,
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
+              (Set<MaterialState> states) =>
+                  states.contains(MaterialState.selected)
+                      ? const TextStyle(color: Colors.white)
+                      : const TextStyle(color: Colors.black),
             ),
-            const NoteTitle(label: "Photo Notecards"),
-            ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: list.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return list[index];
-                }),
-          ],
+          ),
+          child: NavigationBar(
+            backgroundColor: const Color(0xff6750a4),
+            destinations: const [
+              NavigationDestination(
+                selectedIcon: Icon(
+                  Icons.home,
+                ),
+                icon: Icon(
+                  Icons.home,
+                  color: Colors.black,
+                ),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(
+                  Icons.camera,
+                  color: Colors.black,
+                ),
+                label: 'Vision',
+              ),
+              NavigationDestination(
+                icon: Badge(
+                    child: Icon(
+                  Icons.translate,
+                  color: Colors.black,
+                )),
+                label: 'Translation',
+              ),
+            ],
+            onDestinationSelected: (int index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
+            indicatorColor: const Color.fromARGB(255, 244, 223, 247),
+            selectedIndex: currentIndex,
+          ),
         ),
       ),
+      body: IndexedStack(index: currentIndex, children: [
+        SingleChildScrollView(
+          physics: const ScrollPhysics(),
+          child: Column(
+            children: [
+              const DisplayImage(
+                image: 'images/test1.png',
+              ),
+              const NoteTitle(label: "Photo Notecards"),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                ElevatedButton(
+                  onPressed: () {
+                    addNoteCard(
+                        Provider.of<MyNotes>(context, listen: false).selSrc,
+                        Provider.of<MyNotes>(context, listen: false).selTar,
+                        Provider.of<MyNotes>(context, listen: false).selSrcLang,
+                        Provider.of<MyNotes>(context, listen: false).selTarLang,
+                        Provider.of<MyNotes>(context, listen: false).myflag
+                        // context.watch<MyNotes>().selSrc,
+                        // context.watch<MyNotes>().selTar,
+                        // "en",
+                        // context.watch<MyNotes>().selTarLang,
+                        // context.watch<MyNotes>().flag
+                        );
+                  },
+                  child: const Text("Add card"),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      if (list.isNotEmpty) {
+                        removeNoteCard();
+                      } else {
+                        final snackBar = SnackBar(
+                          content: const Text('List is empty'),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () {},
+                          ),
+                          duration: const Duration(milliseconds: 600),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    },
+                    child: const Text("Remove Card")),
+              ]),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        storeNotes(
+                            Provider.of<MyNotes>(context, listen: false)
+                                .selSrcLang,
+                            Provider.of<MyNotes>(context, listen: false).selSrc,
+                            Provider.of<MyNotes>(context, listen: false)
+                                .selTarLang,
+                            Provider.of<MyNotes>(context, listen: false).selTar,
+                            Provider.of<MyNotes>(context, listen: false)
+                                .myflag);
+                      },
+                      child: const Text("Click to store notecards"))
+                ],
+              ),
+              ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: list.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return list[index];
+                  }),
+            ],
+          ),
+        ),
+        const Vision(),
+        const Translatepage(),
+      ]),
       floatingActionButton:
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const SizedBox(
-          width: 15,
-        ),
-        FloatingActionButton(
-          heroTag: "w",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Vision()),
-            );
-          },
-          foregroundColor: Colors.white,
-          backgroundColor: const Color(0xff6750a4),
-          child: const Icon(Icons.camera),
-        ),
-        const SizedBox(width: 10),
-        FloatingActionButton(
-          heroTag: "a",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Translatepage()),
-            );
-          },
-          foregroundColor: Colors.white,
-          backgroundColor: const Color(0xff6750a4),
-          child: const Icon(Icons.translate),
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        ElevatedButton(
-          onPressed: () {
-            addNoteCard(
-                Provider.of<MyNotes>(context, listen: false).selSrc,
-                Provider.of<MyNotes>(context, listen: false).selTar,
-                Provider.of<MyNotes>(context, listen: false).selSrcLang,
-                Provider.of<MyNotes>(context, listen: false).selTarLang,
-                Provider.of<MyNotes>(context, listen: false).myflag
-                // context.watch<MyNotes>().selSrc,
-                // context.watch<MyNotes>().selTar,
-                // "en",
-                // context.watch<MyNotes>().selTarLang,
-                // context.watch<MyNotes>().flag
-                );
-          },
-          child: const Text("Add card"),
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        SizedBox(
-          width: 100,
-          child: FloatingActionButton(
-              heroTag: "nfe",
-              onPressed: () {
-                if (list.isNotEmpty) {
-                  removeNoteCard();
-                } else {
-                  final snackBar = SnackBar(
-                    content: const Text('List is empty'),
-                    action: SnackBarAction(
-                      label: 'Undo',
-                      onPressed: () {},
-                    ),
-                    duration: const Duration(milliseconds: 600),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                }
-              },
-              child: const Text("Remove Card")),
-        ),
+          const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        // Text("eh"),
+        // const SizedBox(
+        //   width: 15,
+        // ),
+        // FloatingActionButton(
+        //   heroTag: "w",
+        //   onPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => const Vision()),
+        //     );
+        //   },
+        //   foregroundColor: Colors.white,
+        //   backgroundColor: const Color(0xff6750a4),
+        //   child: const Icon(Icons.camera),
+        // ),
+        // const SizedBox(width: 10),
+        // FloatingActionButton(
+        //   heroTag: "a",
+        //   onPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => const Translatepage()),
+        //     );
+        //   },
+        //   foregroundColor: Colors.white,
+        //   backgroundColor: const Color(0xff6750a4),
+        //   child: const Icon(Icons.translate),
+        // ),
+        // const SizedBox(
+        //   width: 10,
+        // ),
       ] //children
               ),
     );

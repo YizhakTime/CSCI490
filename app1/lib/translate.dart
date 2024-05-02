@@ -442,6 +442,15 @@ class _AddnotecardState extends State<Addnotecard> {
   Future<DocumentReference> storeNotes(
       bool flag, String text1, String text2, String text3, String text4) {
     if (!flag) {
+      final snackBar = SnackBar(
+        content: const Text('Translation does not exist'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {},
+        ),
+        duration: const Duration(milliseconds: 600),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       throw Exception('Must have text');
     }
 
@@ -612,60 +621,60 @@ class _TranslatepageState extends State<Translatepage> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         //when tapping on screen outside form, it dismisses keyboard
         child: Scaffold(
-            appBar: AppBar(
-                centerTitle: true,
-                title: const Text(
-                  "Language Learner",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                )),
+            // appBar: AppBar(
+            //     centerTitle: true,
+            //     title: const Text(
+            //       "Language Learner",
+            //       style: TextStyle(
+            //           color: Colors.white, fontWeight: FontWeight.bold),
+            //     )),
             body: SingleChildScrollView(
-              physics: const ScrollPhysics(),
-              child: Column(children: [
-                // ElevatedButton(
-                //   child: const Text("Go back"),
-                //   onPressed: () {
-                //     // translate();
-                //     Navigator.pop(context);
-                //   },
-                // ),
-                const Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Text(
-                    "Enter a text to translate.",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontStyle: FontStyle.normal,
-                    ),
-                  ),
+          physics: const ScrollPhysics(),
+          child: Column(children: [
+            // ElevatedButton(
+            //   child: const Text("Go back"),
+            //   onPressed: () {
+            //     // translate();
+            //     Navigator.pop(context);
+            //   },
+            // ),
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                "Enter a text to translate.",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontStyle: FontStyle.normal,
                 ),
-                MyForm(
-                  c: (formText, formOutput) {
-                    input = setInput(formText);
-                    output = setOutput(formOutput);
-                    // input = formOutput;
-                    // output = formText;
-                  },
+              ),
+            ),
+            MyForm(
+              c: (formText, formOutput) {
+                input = setInput(formText);
+                output = setOutput(formOutput);
+                // input = formOutput;
+                // output = formText;
+              },
 
-                  d: (inLang, outLang) {
-                    inLabel = setInpLang(inLang);
-                    outLabel = setOutLang(outLang);
-                  },
-                  // inputText: updateInput,
-                  // outputText: updateOutput,
-                ),
-                const Dropdown(),
-                const SizedBox(
-                  height: 20,
-                ),
-                Addnotecard(
-                  inputtext: input,
-                  outputtext: output,
-                  inputLang: inLabel,
-                  outputLang: outLabel,
-                ),
-              ]),
-            )),
+              d: (inLang, outLang) {
+                inLabel = setInpLang(inLang);
+                outLabel = setOutLang(outLang);
+              },
+              // inputText: updateInput,
+              // outputText: updateOutput,
+            ),
+            const Dropdown(),
+            const SizedBox(
+              height: 20,
+            ),
+            Addnotecard(
+              inputtext: input,
+              outputtext: output,
+              inputLang: inLabel,
+              outputLang: outLabel,
+            ),
+          ]),
+        )),
       ),
       //),
     );

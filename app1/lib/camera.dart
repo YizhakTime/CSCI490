@@ -302,18 +302,16 @@ class _VisionState extends State<Vision> {
                 });
               },
             ),
-            SpeedDialChild(
-              child: const Icon(Icons.exit_to_app),
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              label: 'Exit',
-              labelStyle: const TextStyle(fontSize: 18.0),
-              onTap: () {
-                Navigator.pop(context);
-
-                // Navigator.pop(context, myinput);
-              },
-            ),
+            // SpeedDialChild(
+            //   child: const Icon(Icons.exit_to_app),
+            //   backgroundColor: Colors.blue,
+            //   foregroundColor: Colors.white,
+            //   label: 'Exit',
+            //   labelStyle: const TextStyle(fontSize: 18.0),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //   },
+            // ),
           ],
         ),
       ),
@@ -690,17 +688,31 @@ class _YoloV8State extends State<YoloV8> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                TextButton(
-                    onPressed: chooseImage,
-                    child: const Text("Select an image.")),
-                ElevatedButton(
-                    onPressed: yoloOnImage, child: const Text("Detect.")),
                 const SizedBox(
                   width: 10,
                 ),
                 SizedBox(
-                  width: 100,
-                  height: 50,
+                  width: 90,
+                  height: 40,
+                  child: ElevatedButton(
+                      onPressed: chooseImage,
+                      child: const Text("Select Image")),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                  width: 90,
+                  height: 40,
+                  child: ElevatedButton(
+                      onPressed: yoloOnImage, child: const Text("Detect")),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                  width: 90,
+                  height: 40,
                   child: ElevatedButton(
                       onPressed: () {
                         getData(pic._out!.language);
