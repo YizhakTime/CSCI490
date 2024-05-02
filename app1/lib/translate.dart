@@ -14,7 +14,17 @@ enum LanguageLabel {
   italian("it"),
   persian("fa"),
   turkish("tr"),
-  japanese("ja");
+  japanese("ja"),
+  french("fr"),
+  korean("ko"),
+  hindi("hi"),
+  dutch("nl"),
+  portuguese("pt"),
+  russian("ru"),
+  arabic("ar"),
+  malay("ms"),
+  indonesian("id"),
+  hebrew("iw");
 
   const LanguageLabel(this.label);
   final String label;
@@ -128,7 +138,7 @@ class Notecard extends StatelessWidget {
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            TextSpan(text: "Translation: $output")
+                            TextSpan(text: "Text: $output")
                           ]),
                     )
                     // Text("Target Language: $outLang\nTranslation: $output",

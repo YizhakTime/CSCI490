@@ -18,7 +18,17 @@ enum Languages {
   italian("it"),
   persian("fa"),
   turkish("tr"),
-  japanese("ja");
+  japanese("ja"),
+  french("fr"),
+  korean("ko"),
+  hindi("hi"),
+  dutch("nl"),
+  portuguese("pt"),
+  russian("ru"),
+  arabic("ar"),
+  malay("ms"),
+  indonesian("id"),
+  hebrew("iw");
 
   const Languages(this.language);
   final String language;
