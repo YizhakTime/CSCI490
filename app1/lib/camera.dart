@@ -571,7 +571,9 @@ class _YoloVideoState extends State<YoloVideo> {
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
               border: Border.all(color: Colors.pink, width: 2.0)),
           child: Text(
-            "$translation ${(res['box'][4] * 100).toStringAsFixed(0)}%",
+            // "$
+            translation,
+            // ${(res['box'][4] * 100).toStringAsFixed(0)}%",
             style: TextStyle(
               background: Paint()..color = getColor,
               color: Colors.white,
@@ -799,8 +801,8 @@ class _YoloV8State extends State<YoloV8> {
             borderRadius: const BorderRadius.all(Radius.circular(10.0)),
             border: Border.all(color: Colors.pink, width: 2.0),
           ),
-          child: Text(
-              "$translation ${(result['box'][4] * 100).toStringAsFixed(0)}%",
+          child: Text(translation,
+              // ${(result['box'][4] * 100).toStringAsFixed(0)}%",
               style: TextStyle(
                 background: Paint()..color = pickcolor,
                 color: Colors.white,
