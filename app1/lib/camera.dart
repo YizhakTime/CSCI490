@@ -558,7 +558,7 @@ class _YoloVideoState extends State<YoloVideo> {
 
     double xDirection = video.width / (myImage?.height ?? 1);
     double yDirection = video.height / (myImage?.width ?? 1);
-    Color getColor = const Color.fromARGB(255, 50, 233, 30);
+    Color getColor = const Color.fromARGB(255, 30, 132, 233);
     return results.map((res) {
       setTranslation(res['tag'], "en", output);
       return Positioned(
@@ -786,7 +786,7 @@ class _YoloV8State extends State<YoloV8> {
     double newHeight = newWidth / imgRatio;
     double factorY = newHeight / (imgHeight);
     double pady = (screen.height - newHeight) / 2;
-    Color pickcolor = const Color.fromARGB(255, 50, 233, 30);
+    Color pickcolor = const Color.fromARGB(255, 30, 132, 233);
     return picresults.map((result) {
       setTranslation(result['tag'], "en", src);
       return Positioned(
