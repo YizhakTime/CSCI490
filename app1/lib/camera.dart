@@ -221,6 +221,7 @@ Future<String> translate(String mytext, String option, String output) async {
   return textResult;
 }
 
+//Referenced flutter vision package
 class Vision extends StatefulWidget {
   const Vision({super.key});
 
@@ -242,16 +243,8 @@ class _VisionState extends State<Vision> {
   @override
   void dispose() async {
     super.dispose();
-    // await vision.closeTesseractModel();
     await vision.closeYoloModel();
   }
-
-  // String setInput(String inp) {
-  //   setState(() {
-  //     myinput = inp;
-  //   });
-  //   return myinput;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -330,7 +323,6 @@ class _VisionState extends State<Vision> {
     if (option == Options.frame) {
       return YoloVideo(myvision: vision);
     }
-    // return Container();
     return const Text("Choose option");
   }
 }
