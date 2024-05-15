@@ -12,4 +12,5 @@ Timeline:
 (1/30) -> Build basic scaffolding for app  
 (2/4) -> Added basic sign-in page  
 (2/10) -> Can Signin/Signup  
-(2/20)-> Can translate form text into another language 
+(2/20)-> Can translate form text into another language  
+(5/7) -> Can view camera, translate them, add photo, translate them, save to flashcards, view notecards
