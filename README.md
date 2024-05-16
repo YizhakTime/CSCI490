@@ -14,3 +14,4 @@ Timeline:
 (2/10) -> Can Signin/Signup  
 (2/20)-> Can translate form text into another language  
 (5/7) -> Can view camera, translate them, add photo, translate them, save to flashcards, view notecards
+- Added app1 directory which has Flutter code, yolov8 has pretrained ultralytics yolov8 model and code for object detection
