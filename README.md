@@ -16,4 +16,4 @@ Timeline:
 (5/7) -> Can view camera, translate them, add photo, translate them, save to flashcards, view notecards
 - Added app1 directory which has Flutter code, yolov8 directory has pretrained ultralytics yolov8 model and code for object detection
 - Used Firebase Auth UI for user authentication, Firebase for backend, Flutter vision package, ultralytics model
-- Only works with 80 objects via COCO dataset in Ultrlytics site
+- Only works with 80 objects via COCO dataset in Ultralytics site
